@@ -93,7 +93,7 @@ public class TestJSON {
 
             String sCurrentLine;
 
-            br = new BufferedReader(new FileReader("C:/Users/tlum1/f17-mp5-tylerlum_iadejumo/data/restants.json"));
+            br = new BufferedReader(new FileReader("C:/Users/tlum1/f17-mp5-tylerlum_iadejumo/data/restaurants.json"));
 
             while ((sCurrentLine = br.readLine()) != null) {
                 System.out.println("Record:\t" + sCurrentLine);
