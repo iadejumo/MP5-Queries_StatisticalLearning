@@ -12,7 +12,7 @@ public class YelpDB implements MP5Db<Object> {
 	private File users;
 	
 	public YelpDB(String restaurantFilename,String reviewFilename, String userFilename) {
-
+		
 	}
 	@Override
 	public Set getMatches(String queryString) {
