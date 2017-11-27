@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Set;
 import java.util.function.ToDoubleBiFunction;
 
+
 public class YelpDB implements MP5Db<Object> {
 
 	private File restaurants;
