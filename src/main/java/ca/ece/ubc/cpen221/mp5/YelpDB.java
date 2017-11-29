@@ -1,19 +1,26 @@
 package ca.ece.ubc.cpen221.mp5;
 
 import java.io.File;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.ToDoubleBiFunction;
 
-
 public class YelpDB implements MP5Db<Object> {
 
-	private File restaurants;
-	private File reviews;
-	private File users;
-	
-	public YelpDB(String restaurantFilename,String reviewFilename, String userFilename) {
-		
+	private Map<String, Restaurant> restaurants;
+	private Map<String, Review> reviews;
+	private Map<String, User> users;
+	private static final int MIN_LAT = 0;
+	private static final int MIN_LONG = 1;
+	private static final int MAX_LAT = 2;
+	private static final int MAX_LONG = 3;
+	private static final int LAT = 0;
+	private static final int LONG = 1;
+
+	public YelpDB(String restaurantFilename, String reviewFilename, String userFilename) {
+
 	}
+
 	@Override
 	public Set getMatches(String queryString) {
 		// TODO Auto-generated method stub
@@ -22,8 +29,72 @@ public class YelpDB implements MP5Db<Object> {
 
 	@Override
 	public String kMeansClusters_json(int k) {
-		// TODO Auto-generated method stub
+
+		for (int i = 0;i<k;i++) {
+			
+		}
+		
+		
 		return null;
+	}
+	
+	private double generateRandomLongitudeInRange() {
+		double maxLongitude = maxLongitude();
+		double minLongitude = minLongitude();
+		double diff = maxLongitude - minLongitude;
+		double randLongitude = Math.random()*diff + minLongitude;
+		return randLongitude;
+	}
+	
+	private double generateRandomLatitudeInRange() {
+		
+		double maxLatitude = maxLatitude();
+		double minLatitude = minLatitude();
+		double diff = maxLatitude - minLatitude;
+		double randLatitude = Math.random()*diff + minLatitude;
+		return randLatitude;
+	}
+	
+	
+
+	private double maxLongitude() {
+		double maxLongitude = Double.MIN_VALUE;
+		for (String restName : restaurants.keySet()) {
+			longitude = restaurants.get(restName).getLongitude();
+			if (maxLongitude < longitude)
+				maxLongitude = longitude;
+		}
+		return maxLongitude;
+	}
+
+	private int minLongitude() {
+		double minLongitude = Double.MAX_VALUE;
+		for (String restName : restaurants.keySet()) {
+			longitude = restaurants.get(restName).getLongitude();
+			if (minLongitude > longitude)
+				minLongitude = longitude;
+		}
+		return minLongitude;
+	}
+
+	private int maxLatitude() {
+		double maxLatitude = Double.MIN_VALUE;
+		for (String restName : restaurants.keySet()) {
+			latitude = restaurants.get(restName).getLatitude();
+			if (maxLatitude < latitude)
+				maxLatitude = latitude;
+		}
+		return maxLatitude;
+	}
+
+	private int minLatitude() {
+		double minLatitude = Double.MAX_VALUE;
+		for (String restName : restaurants.keySet()) {
+			latitude = restaurants.get(restName).getLatitude();
+			if (minLatitude > latitude)
+				minLatitude = latitude;
+		}
+		return minLatitude;
 	}
 
 	@Override
