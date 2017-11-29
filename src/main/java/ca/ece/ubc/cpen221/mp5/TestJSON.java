@@ -20,7 +20,7 @@ public class TestJSON {
 	public static void main(String[] args) throws org.json.simple.parser.ParseException, FileNotFoundException, IOException {
 
 		
-		String fileName = "C:/Users/Trainee/Desktop/CPEN221/f17-mp5-tylerlum_iadejumo/data/restaurants.json";
+		String fileName = "C:\\Users\\Trainee\\Desktop\\CPEN221\\f17-mp5-tylerlum_iadejumo\\data\\users.json";
 		BufferedReader br =null;
         JSONParser parser = new JSONParser();
 
@@ -37,7 +37,10 @@ public class TestJSON {
                 try {
                     obj = parser.parse(sCurrentLine);
                     JSONObject jsonObject = (JSONObject) obj;
-
+                    
+                    User r = new User(jsonObject);
+                    System.out.println("Categories:\t" + r.votes);
+/*
                     String rel = (String) jsonObject.get("url");
                     System.out.println(rel);
 
@@ -46,7 +49,7 @@ public class TestJSON {
 
                     Boolean end = (Boolean) jsonObject.get("open");
                     System.out.println(end);
-
+*/
                 } catch (ParseException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();

@@ -1,6 +1,10 @@
 package ca.ece.ubc.cpen221.mp5;
 
 import java.io.File;
+<<<<<<< HEAD
+=======
+import java.util.HashMap;
+>>>>>>> 8904b02370c5e6ac445bce51a0eaaffd83cc0d55
 import java.util.Map;
 import java.util.Set;
 import java.util.function.ToDoubleBiFunction;
@@ -10,14 +14,9 @@ public class YelpDB implements MP5Db<Object> {
 	private Map<String, Restaurant> restaurants;
 	private Map<String, Review> reviews;
 	private Map<String, User> users;
-	private static final int MIN_LAT = 0;
-	private static final int MIN_LONG = 1;
-	private static final int MAX_LAT = 2;
-	private static final int MAX_LONG = 3;
-	private static final int LAT = 0;
-	private static final int LONG = 1;
 
 	public YelpDB(String restaurantFilename, String reviewFilename, String userFilename) {
+
 
 	}
 
