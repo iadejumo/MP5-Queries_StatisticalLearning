@@ -2,14 +2,11 @@ package ca.ece.ubc.cpen221.mp5;
 
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -17,13 +14,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.ToDoubleBiFunction;
-import java.util.stream.Stream;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-
-import org.json.simple.JSONObject;
 
 public class YelpDB implements MP5Db<Object> {
 
@@ -363,19 +357,19 @@ public class YelpDB implements MP5Db<Object> {
 		
 		long sumPrice = 0;
 		long sumRating = 0;
-		double avgPrice;
-		double avgRating;
+		double avgPrice = 0;
+		double avgRating = 0;
 		
 		
 		for (String review_id: reviews.keySet()) {
 			Review review = reviews.get(review_id);
 			if (review.getUser_id().equals(user)) {
-				Long rating = review.getStars();
+				long rating = review.getStars();
 				String restaurant = review.getBusiness_id();
-				Long price = restaurants.get(restaurant).getPrice();
+				long price = restaurants.get(restaurant).getPrice();
 				
 				sumPrice += price;
-				sumRating +=rating;
+				sumRating += rating;
 				
 				prices.add(price);
 				ratings.add(rating);	
@@ -383,10 +377,13 @@ public class YelpDB implements MP5Db<Object> {
 		}
 		
 		int num = prices.size();
-		avgPrice = sumPrice/num;
-		avgRating = sumRating/num;
-		
+		if (num > 0) {
+			avgPrice = (double)sumPrice/num;
+			avgRating = (double)sumRating/num;
+		}
+	
 		List<Double> avgList = new ArrayList<Double>();
+		
 		avgList.add(avgPrice);
 		avgList.add(avgRating);
 		
@@ -395,9 +392,14 @@ public class YelpDB implements MP5Db<Object> {
 	
 	private ToDoubleBiFunction<YelpDB, String> generatePredictor(List<Long> prices, List<Long> ratings, double meanX, double meanY) {
 		int size = prices.size();
-		double sxx = 0;
-		double syy = 0;
-		double sxy = 0;
+		
+		if(size <= 1) {
+			throw new IllegalArgumentException("The user has too few reviews to use to predict");
+		}
+		
+		double sxx = 0.0;
+		double syy = 0.0;
+		double sxy = 0.0;
 		double x;
 		double y;
 		
@@ -406,14 +408,15 @@ public class YelpDB implements MP5Db<Object> {
 			y = ratings.get(i);
 			sxx += Math.pow((x - meanX), 2);
 			syy += Math.pow((y - meanY), 2);
-			sxy += x*y;
+			sxy += (x - meanX)*(y - meanY);
 		}
 		
 		double b = sxy/sxx;
 		double a = meanY - b*meanX;
 		double r_squared = Math.pow(sxy, 2)/(sxx * syy);
 		
-		ToDoubleBiFunction<YelpDB, String> predictor = (yelpDB, restaurant) -> (restaurants.get(restaurant).getPrice())*b + a;
+		System.out.println(prices + "\n" + ratings);
+		ToDoubleBiFunction<YelpDB, String> predictor = (yelpDB, restaurant) -> ((yelpDB.restaurants.get(restaurant).getPrice())*b + a);
 		
 		return predictor;
 	}

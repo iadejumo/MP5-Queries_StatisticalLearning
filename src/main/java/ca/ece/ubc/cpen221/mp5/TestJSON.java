@@ -4,11 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.function.ToDoubleBiFunction;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -19,60 +16,16 @@ public class TestJSON {
 	
 	public static void main(String[] args) throws org.json.simple.parser.ParseException, FileNotFoundException, IOException {
 
-		/*
-		String fileName = "data\\users.json";
-		BufferedReader br =null;
-        JSONParser parser = new JSONParser();
-
-        try {
-
-            String sCurrentLine;
-
-            br = new BufferedReader(new FileReader(fileName));
-
-            while ((sCurrentLine = br.readLine()) != null) {
-                System.out.println("Record:\t" + sCurrentLine);
-
-                Object obj;
-                try {
-                    obj = parser.parse(sCurrentLine);
-                    JSONObject jsonObject = (JSONObject) obj;
-                    
-                    User r = new User(jsonObject);
-                    //System.out.println("Categories:\t" + r.votes);
-/*
-                    String rel = (String) jsonObject.get("url");
-                    System.out.println(rel);
-
-                    Double start = (Double) jsonObject.get("longitude");
-                    System.out.println(start);
-
-                    Boolean end = (Boolean) jsonObject.get("open");
-                    System.out.println(end);
-
-                } catch (ParseException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (br != null)br.close();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        }
- */
 		String userFile = "data\\users.json";
 		String restaurantFile = "data\\restaurants.json";
 		String reviewFile = "data\\reviews.json";
 				
 		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
 		
-		System.out.println("Done");
+		ToDoubleBiFunction<YelpDB, String> predictor = yelpDB.getPredictorFunction("dRSz0aNLiHOPp4sU5dms5g");
+		double predicted = predictor.applyAsDouble(yelpDB, "8leHSCn0DCa1ilxfbHuCQA");
+		
+		System.out.println(predicted);
 		
     }
 	
