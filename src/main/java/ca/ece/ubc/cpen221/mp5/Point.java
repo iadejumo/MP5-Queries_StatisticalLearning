@@ -24,4 +24,9 @@ public class Point {
 
 		return false;
 	}
+	
+	@Override
+	public String toString() {
+		return latitude + " " + longitude;
+	}
 }

@@ -5,6 +5,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -179,8 +181,43 @@ public class YelpDB implements MP5Db<Object> {
 		return jsonFormat;
 	}
 
+	
+	public static void main(String[] args) {
+		String userFile = "data\\users.json";
+		String restaurantFile = "data\\restaurants.json";
+		String reviewFile = "data\\reviews.json";
+				
+		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
+		
+		System.out.println("Done");
+		System.out.println("Max Long" + yelpDB.maxLongitude());
+		System.out.println("Min Long" + yelpDB.minLongitude());
+		System.out.println("Max Lat" + yelpDB.maxLatitude());
+		System.out.println("Min Lat"+yelpDB.minLatitude());
+		
+		for (int k=0;k<5;k++) {
+			Point p = yelpDB.generateRandomPointInRange();
+			System.out.println(p);
+		}
+		String s = yelpDB.kMeansClusters_json(2);
+		System.out.println(s);
+		
+		int count=0;
+		for (int k=0;k<s.length()-10;k++) {
+			if (s.substring(k, k+10).equals("cluster\":1"))
+				count++;
+		}
+		System.out.println(count);
+		System.out.println(yelpDB.restaurants.size());
+	}
+	
 	// converts List<Set<Restaurant>> to a String in Json Format
 	private String convertListToJsonFormat(List<Set<Restaurant>> clusterList) {
+		int count = 0;
+		for (Set<Restaurant> s: clusterList)
+			for(Restaurant r: s)
+				count++;
+		System.out.println("NumRestaurants: " + count);
 		String jsonFormat = "";
 
 		// for each Restaurant in each cluster, create a JSONObject with the necessary
@@ -212,16 +249,30 @@ public class YelpDB implements MP5Db<Object> {
 		// stop when the update to the new average does not change any of the centroid
 		// points
 		Map<Point, Point> updatedCentroids;
+		boolean notDone = true;
 		do {
 			findClosestRestaurants(clusterMap);
 			updatedCentroids = findNewCentroids(clusterMap);
-		} while (newCentroidsFoundOrNot(updatedCentroids));
+			notDone = newCentroidsFoundOrNot(updatedCentroids);
+			if (notDone)
+				clusterMap = updateClusterMap(clusterMap,updatedCentroids);
+		} while (notDone);
 
 		// convert the clusterMap to a clusterList
 		List<Set<Restaurant>> clusterList = new ArrayList<Set<Restaurant>>();
 		for (Point p : clusterMap.keySet())
 			clusterList.add(clusterMap.get(p));
 		return clusterList;
+	}
+	
+	// returns a new Map<Point,Set<Restaurant>> that has the same restaurant sets as oldClusterMap, but with updatedCentroid points
+	private Map<Point, Set<Restaurant>> updateClusterMap(Map<Point, Set<Restaurant>> oldClusterMap, Map<Point, Point> updatedCentroids){
+		Map<Point, Set<Restaurant>> newClusterMap = new HashMap<Point, Set<Restaurant>>();
+		
+		for (Point oldCentroid: oldClusterMap.keySet()) 
+			newClusterMap.put(updatedCentroids.get(oldCentroid), new HashSet<Restaurant>());
+		
+		return newClusterMap;
 	}
 
 	// returns true if at least one centroid point has changed
@@ -270,7 +321,7 @@ public class YelpDB implements MP5Db<Object> {
 		for (String business_id : restaurants.keySet()) {
 			Restaurant r = restaurants.get(business_id);
 			Point restaurantLoc = new Point(r.getLatitude(), r.getLongitude());
-			double minDist = Double.MAX_VALUE;
+			double minDist = Double.POSITIVE_INFINITY;
 			Point closestCentroid = null;
 
 			// find the centroid Point that restaurant is closest to
@@ -300,18 +351,20 @@ public class YelpDB implements MP5Db<Object> {
 	}
 
 	private double maxLongitude() {
-		double maxLongitude = Double.MIN_VALUE;
+		double maxLongitude = Double.NEGATIVE_INFINITY;
 		double longitude;
 		for (String restName : restaurants.keySet()) {
 			longitude = restaurants.get(restName).getLongitude();
+
 			if (maxLongitude < longitude)
 				maxLongitude = longitude;
+			
 		}
 		return maxLongitude;
 	}
 
 	private double minLongitude() {
-		double minLongitude = Double.MAX_VALUE;
+		double minLongitude = Double.POSITIVE_INFINITY;
 		double longitude;
 		for (String restName : restaurants.keySet()) {
 			longitude = restaurants.get(restName).getLongitude();
@@ -322,7 +375,7 @@ public class YelpDB implements MP5Db<Object> {
 	}
 
 	private double maxLatitude() {
-		double maxLatitude = Double.MIN_VALUE;
+		double maxLatitude = Double.NEGATIVE_INFINITY;
 		double latitude;
 		for (String restName : restaurants.keySet()) {
 			latitude = restaurants.get(restName).getLatitude();
@@ -333,7 +386,7 @@ public class YelpDB implements MP5Db<Object> {
 	}
 
 	private double minLatitude() {
-		double minLatitude = Double.MAX_VALUE;
+		double minLatitude = Double.POSITIVE_INFINITY;
 		double latitude;
 		for (String restName : restaurants.keySet()) {
 			latitude = restaurants.get(restName).getLatitude();
