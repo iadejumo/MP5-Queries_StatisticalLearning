@@ -1,5 +1,6 @@
 package ca.ece.ubc.cpen221.mp5;
 
+import java.util.Collections;
 import java.util.Map;
 
 import org.json.simple.JSONObject;
@@ -32,7 +33,7 @@ public class Review {
 		return business_id;
 	}
 	public Map<String,Integer> getVotes() {
-		return votes;
+		return Collections.unmodifiableMap(votes);
 	}
 	public String getReview_id() {
 		return review_id;

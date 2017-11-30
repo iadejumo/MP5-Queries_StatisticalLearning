@@ -1,5 +1,6 @@
 package ca.ece.ubc.cpen221.mp5;
 
+import java.util.Collections;
 import java.util.Map;
 
 import org.json.simple.JSONObject;
@@ -28,7 +29,7 @@ public class User {
 		return url;
 	}
 	public Map<String,Integer> getVotes() {
-		return votes;
+		return Collections.unmodifiableMap(votes);
 	}
 	public long getReview_count() {
 		return review_count;
