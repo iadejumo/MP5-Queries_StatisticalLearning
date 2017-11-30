@@ -19,7 +19,9 @@ public class TestJSON {
 	
 	public static void main(String[] args) throws org.json.simple.parser.ParseException, FileNotFoundException, IOException {
 
-		String fileName = "C:\\Users\\Trainee\\Desktop\\CPEN221\\f17-mp5-tylerlum_iadejumo\\data\\users.json";
+		/*
+		String fileName = "data\\users.json";
+>>>>>>> 397dda50fc7cd5d707c1c90dba18dc886183184d
 		BufferedReader br =null;
         JSONParser parser = new JSONParser();
 
@@ -48,7 +50,7 @@ public class TestJSON {
 
                     Boolean end = (Boolean) jsonObject.get("open");
                     System.out.println(end);
-*/
+
                 } catch (ParseException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -64,7 +66,15 @@ public class TestJSON {
                 ex.printStackTrace();
             }
         }
- 
+ */
+		String userFile = "data\\users.json";
+		String restaurantFile = "data\\restaurants.json";
+		String reviewFile = "data\\reviews.json";
+				
+		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
+		
+		System.out.println("Done");
+		
     }
 	
 	public static void readJsonFile() {
