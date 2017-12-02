@@ -245,24 +245,12 @@ public class YelpDB implements MP5Db<Restaurant> {
 		// Centroids to the average of the cluster
 		// stop when the update to the new centroids doesn't change any of the centroids
 
-		KMeansVisualizer vis = new KMeansVisualizer();
-		vis.setDelay(1000);
-
 		do {
 			clusterMap = updateClusterMap(updatedCentroids);
 			findClosestRestaurants(clusterMap);
-
-			for (Point centroid : clusterMap.keySet()) {
-				vis.beginCluster(centroid.latitude, centroid.longitude);
-				for (Restaurant r : clusterMap.get(centroid))
-					vis.addPoint(r.getLatitude(), r.getLongitude());
-			}
-
-			vis.show();
 			updatedCentroids = findNewCentroids(clusterMap);
 			// } while (newCentroidsFound(updatedCentroids) );
 		} while (newCentroidsFound(updatedCentroids) || emptyClusterIn(clusterMap));
-		vis.close();
 
 		// convert the clusterMap to a clusterList
 		List<Set<Restaurant>> clusterList = new ArrayList<Set<Restaurant>>();
