@@ -121,7 +121,7 @@ public class ExpressionEvalution extends QueryGrammarBaseListener {
 		
 		System.out.println(finalS);
 		
-		List <String> list = YelpDB.restaurants.keySet().stream().filter(x -> YelpDB.restaurants.get(x).getCategories().contains(finalS)).collect(Collectors.toList());
+		List <String> list = YelpDB.getRestaurants().keySet().stream().filter(x -> YelpDB.restaurants.get(x).getCategories().contains(finalS)).collect(Collectors.toList());
 		System.out.println(ctx.string().WORD());
 		System.out.println(list);
 	}

@@ -25,12 +25,12 @@ public class TestJSON {
 				
 		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
 		
-		ToDoubleBiFunction<MP5Db<Restaurant>, String> predictor = yelpDB.getPredictorFunction("fL8ujZ89qTyhbjr1Qz5aSg");
+		ToDoubleBiFunction<MP5Db<Restaurant>, String> predictor = yelpDB.getPredictorFunction("FjNgN6Dk9fh4NatwthoFgA");
 		double predicted = predictor.applyAsDouble(yelpDB, "P2XKcDLVHUuOdGNBQtMFRQ");
 		
 		String s = "in(Telegraph Ave) && (category(Chinese) || category(Italian)) && price <= 2";
 		
-		yelpDB.parseInput(s);
+		//yelpDB.parseInput(s);
 		System.out.println(predicted);
 		
     }

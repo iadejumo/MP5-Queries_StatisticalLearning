@@ -70,8 +70,29 @@ public class GetPredictorTests {
 		assertTrue(Math.abs(expected - predicted) < 0.001);
 	}
 	
+	@Test
+	public void test3() throws ParseException, IOException {
+		String userFile = "data\\users.json";
+		String restaurantFile = "data\\restaurants.json";
+		String reviewFile = "data\\reviews.json";
+				
+		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
+		
+		String userID = "FjNgN6Dk9fh4NatwthoFgA";
+		String restaurantID = "6QZR4ToHKlse0yhqpU5ijg";
+		
+		ToDoubleBiFunction<MP5Db<Restaurant>, String> predictor = yelpDB.getPredictorFunction(userID);
+		double predicted = predictor.applyAsDouble(yelpDB, restaurantID);
+		double expected = 5.0;
+		
+		System.out.println("Price " + yelpDB.getRestaurants().get(restaurantID).getPrice());
+		System.out.println(predicted);
+
+		assertTrue(Math.abs(expected - predicted) < 0.001);
+	}
+	
 	@Test (expected = IllegalArgumentException.class)
-	public void Test6() throws ParseException, IOException {
+	public void test6() throws ParseException, IOException {
 		String userFile = "data\\users.json";
 		String restaurantFile = "data\\restaurants.json";
 		String reviewFile = "data\\reviews.json";
