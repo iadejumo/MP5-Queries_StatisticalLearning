@@ -1,4 +1,4 @@
-package ca.ece.ubc.cpen221.mp5;
+package ca.ece.ubc.cpen221.mp5.test;
 
 import static org.junit.Assert.*;
 
@@ -7,6 +7,10 @@ import java.util.function.ToDoubleBiFunction;
 
 import org.json.simple.parser.ParseException;
 import org.junit.Test;
+
+import ca.ece.ubc.cpen221.mp5.MP5Db;
+import ca.ece.ubc.cpen221.mp5.Restaurant;
+import ca.ece.ubc.cpen221.mp5.YelpDB;
 
 public class GetPredictorTests {
 	
