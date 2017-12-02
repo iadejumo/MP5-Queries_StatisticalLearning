@@ -24,10 +24,30 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-
-
 public class YelpDB implements MP5Db<Restaurant> {
 
+	/*
+	 * Abstraction function: restaurants x reviews x users
+	 * 
+	 * Representation Invariants: 
+	 * all Restaurants in restaurants have different business_id's
+	 * all Users in users have different user_id's 
+	 * all Reviews in reviews have different review_id's
+	 * all keys in userToReview are user_id's that map to a list of all review_id's that have the same user_id
+	 * all keys in userToRestaurant are user_id's that map to a list of all business_id's of restaurants that these users have reviewed
+	 * all keys in restaurantToReview are business_id's that map to a list of all review_id's that have the business_id's
+	 * all of the Strings in userToReview/restaurantToReview/userToRestaurant are business_ids/review_ids/user_ids
+	 * which leads to
+	 * restaurantToReview.size() == restaurants.size()
+	 * userToReview.size() == users.size() == userToRestaurant.size()
+	 * 
+	 * 
+	 * Note: review.size()/review_count/votes/average_stars/stars do not have to sum
+	 * up in any way, as reviews and votes could be done to non-restaurant
+	 * reviewable objects
+	 * 
+	 * 
+	 */
 	private Map<String, Restaurant> restaurants;
 	private Map<String, Review> reviews;
 	private Map<String, User> users;
@@ -38,7 +58,12 @@ public class YelpDB implements MP5Db<Restaurant> {
 	private Map<String, List<String>> restaurantToReview;
 	private Map<String, List<String>> userToRestaurant;
 
-
+	/**
+	 * Perform a structured query and return the set of objects that matches the
+	 * query
+	 * 
+	 * @param Stron
+	 */
 	public YelpDB(String restaurantFilename, String reviewFilename, String userFilename)
 			throws ParseException, IOException {
 		restaurants = new HashMap<String, Restaurant>();
@@ -48,7 +73,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 		createRestaurantDB(restaurantFilename);
 		createReviewDB(reviewFilename);
 		createUserDB(userFilename);
-		
+
 		establishRelationships();
 	}
 
@@ -282,7 +307,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 	}
 
 	private boolean emptyClusterIn(Map<Point, Set<Restaurant>> clusterMap) {
-		//only needed for very rare case
+		// only needed for very rare case
 		for (Point centroid : clusterMap.keySet()) {
 			if (clusterMap.get(centroid).isEmpty()) {
 				return true;
@@ -396,13 +421,11 @@ public class YelpDB implements MP5Db<Restaurant> {
 		double avgPrice = avgList.get(0);
 		double avgRating = avgList.get(1);
 
-
 		ToDoubleBiFunction<MP5Db<Restaurant>, String> predictor = generatePredictor(prices, ratings, avgPrice,
 				avgRating);
 
 		return predictor;
 	}
-
 
 	/**
 	 * Finds the different reviews that the user has created, and finds the ratings
@@ -464,7 +487,6 @@ public class YelpDB implements MP5Db<Restaurant> {
 
 		return avgList;
 	}
-
 
 	/**
 	 * Generates a function that predicts the user's ratings for Restaurants in the
