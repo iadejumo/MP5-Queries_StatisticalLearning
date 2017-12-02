@@ -13,15 +13,6 @@ import ca.ece.ubc.cpen221.mp5.Restaurant;
 import ca.ece.ubc.cpen221.mp5.YelpDB;
 
 public class GetPredictorTests {
-	
-	@Test
-	public void test0() throws ParseException, IOException {
-		String userFile = "data\\users.json";
-		String restaurantFile = "data\\restaurants.json";
-		String reviewFile = "data\\reviews.json";
-				
-		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
-	}
 
 	@Test
 	public void test1() throws ParseException, IOException {
@@ -96,7 +87,7 @@ public class GetPredictorTests {
 	}
 	
 	@Test (expected = IllegalArgumentException.class)
-	public void test6() throws ParseException, IOException {
+	public void test4() throws ParseException, IOException {
 		String userFile = "data\\users.json";
 		String restaurantFile = "data\\restaurants.json";
 		String reviewFile = "data\\reviews.json";
