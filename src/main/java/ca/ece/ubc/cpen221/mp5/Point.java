@@ -2,9 +2,12 @@ package ca.ece.ubc.cpen221.mp5;
 
 public class Point {
 
+	//Rep Invariant: latitude and longitude are not NaN
+	//Abstraction Function: latitude x longitude
+	
 	public final double latitude;
 	public final double longitude;
-	private static final double TOLERANCE = 0.0001;
+	private static final double TOLERANCE = 0.000001;
 
 	public Point(double latitude, double longitude) {
 		this.latitude = latitude;
