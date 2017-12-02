@@ -13,13 +13,13 @@ import ca.ece.ubc.cpen221.mp5.Restaurant;
 import ca.ece.ubc.cpen221.mp5.YelpDB;
 
 public class GetPredictorTests {
+	String userFile = "data/users.json";
+	String restaurantFile = "data/restaurants.json";
+	String reviewFile = "data/reviews.json";
 
 	@Test
 	public void test1() throws ParseException, IOException {
-		String userFile = "data\\users.json";
-		String restaurantFile = "data\\restaurants.json";
-		String reviewFile = "data\\reviews.json";
-				
+
 		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
 		
 		String userID = "fL8ujZ89qTyhbjr1Qz5aSg";
@@ -46,10 +46,7 @@ public class GetPredictorTests {
 	
 	@Test
 	public void test2() throws ParseException, IOException {
-		String userFile = "data\\users.json";
-		String restaurantFile = "data\\restaurants.json";
-		String reviewFile = "data\\reviews.json";
-				
+
 		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
 		
 		String userID = "Rto4xWr5gXA2IbrfyAn-Xg";
@@ -67,9 +64,6 @@ public class GetPredictorTests {
 	
 	@Test
 	public void test3() throws ParseException, IOException {
-		String userFile = "data\\users.json";
-		String restaurantFile = "data\\restaurants.json";
-		String reviewFile = "data\\reviews.json";
 				
 		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
 		
@@ -88,9 +82,6 @@ public class GetPredictorTests {
 	
 	@Test (expected = IllegalArgumentException.class)
 	public void test4() throws ParseException, IOException {
-		String userFile = "data\\users.json";
-		String restaurantFile = "data\\restaurants.json";
-		String reviewFile = "data\\reviews.json";
 				
 		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
 		
