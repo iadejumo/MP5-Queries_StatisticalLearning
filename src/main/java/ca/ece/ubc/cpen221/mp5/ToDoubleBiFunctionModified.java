@@ -14,7 +14,7 @@ public class ToDoubleBiFunctionModified implements ToDoubleBiFunction<MP5Db<Rest
 	@Override
 	public double applyAsDouble(MP5Db<Restaurant> t, String u) {
 		// TODO Auto-generated method stub
-		double prediction = ((((YelpDB)t).restaurants.get(u).getPrice()) * b + a);
+		double prediction = ((((YelpDB)t).getRestaurants().get(u).getPrice()) * b + a);
 		
 		if (prediction < 1) {
 			return (double)1;

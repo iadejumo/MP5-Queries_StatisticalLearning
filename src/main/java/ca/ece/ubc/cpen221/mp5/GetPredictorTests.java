@@ -7,6 +7,15 @@ import java.util.function.ToDoubleBiFunction;
 import org.junit.Test;
 
 public class GetPredictorTests {
+	
+	@Test
+	public void test0() {
+		String userFile = "data\\users.json";
+		String restaurantFile = "data\\restaurants.json";
+		String reviewFile = "data\\reviews.json";
+				
+		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
+	}
 
 	@Test
 	public void test1() {
@@ -28,10 +37,10 @@ public class GetPredictorTests {
 		double expected_3 = 1.0;
 		double expected_4 = 1;
 		
-		System.out.println("Price " + yelpDB.restaurants.get(restaurantID).getPrice());
+		System.out.println("Price " + yelpDB.getRestaurants().get(restaurantID).getPrice());
 		System.out.println(predicted_3);
 		
-		System.out.println("Price " + yelpDB.restaurants.get(restaurantID2).getPrice());
+		System.out.println("Price " + yelpDB.getRestaurants().get(restaurantID2).getPrice());
 		System.out.println(predicted_4);
 
 		assertTrue(Math.abs(expected_3 - predicted_3) < 0.001);
@@ -53,7 +62,7 @@ public class GetPredictorTests {
 		double predicted = predictor.applyAsDouble(yelpDB, restaurantID);
 		double expected = 2.718;
 		
-		System.out.println("Price " + yelpDB.restaurants.get(restaurantID).getPrice());
+		System.out.println("Price " + yelpDB.getRestaurants().get(restaurantID).getPrice());
 		System.out.println(predicted);
 
 		assertTrue(Math.abs(expected - predicted) < 0.001);

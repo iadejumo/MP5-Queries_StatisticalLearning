@@ -29,11 +29,15 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class YelpDB implements MP5Db<Restaurant> {
-///////Change to private
-	public static Map<String, Restaurant> restaurants;
-//////Change to private	
+
+	private Map<String, Restaurant> restaurants;	
 	private Map<String, Review> reviews;
 	private Map<String, User> users;
+	
+	private Map<String, List<String>> userToReview;
+	private Map<String, List<String>> restaurantToReview;
+	private Map<String, List<String>> userToRestaurant;
+	
 	private static final double WEIGHT = 2.0;
 
 	public YelpDB(String restaurantFilename, String reviewFilename, String userFilename) {
@@ -44,6 +48,8 @@ public class YelpDB implements MP5Db<Restaurant> {
 		createRestaurantDB(restaurantFilename);
 		createReviewDB(reviewFilename);
 		createUserDB(userFilename);
+		
+		establishRelationships();
 
 	}
 
@@ -159,13 +165,63 @@ public class YelpDB implements MP5Db<Restaurant> {
 
 	}
 
+	private void establishRelationships() {
+		userToReview = new HashMap<String, List<String>> ();
+		restaurantToReview = new HashMap<String, List<String>> ();
+		userToRestaurant = new HashMap<String, List<String>> ();
+		
+		//Establishes user to review relationship
+		for(String user: users.keySet()) {
+			userToReview.put(user, new ArrayList<String>());
+		}
+		
+		for(Review review: reviews.values()) {
+			userToReview.get(review.getUser_id()).add(review.getReview_id());
+		}
+		
+		//Establish restaurants to review relationship
+		for(String restaurant: restaurants.keySet()) {
+			restaurantToReview.put(restaurant, new ArrayList<String>());
+		}
+		
+		for(Review review: reviews.values()) {
+			restaurantToReview.get(review.getBusiness_id()).add(review.getReview_id());
+		}
+		
+		//Establish user to restaurant relationship
+		for(String user: users.keySet()) {
+			userToRestaurant.put(user, new ArrayList<String>());
+		}
+		
+		for(Review review: reviews.values()) {
+			userToRestaurant.get(review.getUser_id()).add(review.getBusiness_id());
+		}
+		
+	}
+	
+	public Map<String, Restaurant> getRestaurants(){
+		return restaurants;
+	}
+	
+	public Map<String, Review> getReviews(){
+		return reviews;
+	}
+	
+	public Map<String, User> getUsers(){
+		return users;
+	}
+	
+	//Uncompleted (Part 5)
+	
 	@Override
 	public Set getMatches(String queryString) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	//Uncompleted (Part 5)
 
-	public void parseInput(String input) {
+	private void parseInput(String input) {
 		CharStream stream = new ANTLRInputStream(input);
 
 		QueryGrammarLexer lexer = new QueryGrammarLexer(stream);
@@ -180,13 +236,6 @@ public class YelpDB implements MP5Db<Restaurant> {
 		ParseTreeWalker walker = new ParseTreeWalker();
 		QueryGrammarListener listener = new ExpressionEvalution();
 		walker.walk(listener, tree);
-	}
-
-	private void evaluateAtoms(String atom) {
-
-		if (atom.equals("in")) {
-
-		}
 	}
 
 	/**
@@ -496,11 +545,14 @@ public class YelpDB implements MP5Db<Restaurant> {
 		double b = sxy / sxx;
 		double a = meanY - b * meanX;
 		double r_squared = Math.pow(sxy, 2) / (sxx * syy);
-
-		System.out.println(xList + "\n" + yList);
+		
+		ToDoubleBiFunction<MP5Db<Restaurant>, String> predictor = new ToDoubleBiFunctionModified(a, b);
+		
+		//TODO : Delete block of code below;
+		System.out.println(a + "\n" + xList + "\n" + yList);
 		//ToDoubleBiFunction<MP5Db<Restaurant>, String> predictor = (yelpDB,
 				//restaurant) -> ((((YelpDB) yelpDB).restaurants.get(restaurant).getPrice()) * b + a);
-		ToDoubleBiFunction<MP5Db<Restaurant>, String> predictor = new ToDoubleBiFunctionModified(a, b);
+		
 
 		return predictor;
 	}
