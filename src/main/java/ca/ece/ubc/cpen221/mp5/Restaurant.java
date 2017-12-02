@@ -11,10 +11,23 @@ public class Restaurant {
 	 * Abstraction Function: all fields of this restaurant, which represent a
 	 * restaurant's characteristics
 	 * 
-	 * Rep. Invariants: no fields are null 1<=stars<=5 1<=price<=4 photo_url and url
-	 * are URLs that link to websites for the restaurant longitude and latitude are
-	 * within UCB's range review_count>=0 neighborhoods, state, city, full_address,
-	 * schools match restaurant's real location type.equals("restaurant")
+	 * Rep. Invariants: 
+	 * 
+	 * no fields are null 
+	 * 
+	 * 1<=stars<=5 
+	 * 
+	 * 1<=price<=4 
+	 * 
+	 * photo_url and url are URLs that link to websites for the restaurant
+	 * 
+	 * longitude and latitude are within UCB's range 
+	 * 
+	 * review_count>=0 
+	 * 
+	 * neighborhoods, state, city, full_address, schools match restaurant's real location 
+	 * 
+	 * type.equals("restaurant")
 	 */
 
 	private boolean open;
