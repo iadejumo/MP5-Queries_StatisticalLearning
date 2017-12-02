@@ -201,7 +201,7 @@ public class KMeansClusterTest {
 	@Test
 	public void test4() {
 		Point p = new Point(10, -20);
-		assertTrue(p.toString().equals("10.0 -20.0"));
+		assertTrue(p.toString().equals("(10.0 -20.0)"));
 	}
 	
 	
