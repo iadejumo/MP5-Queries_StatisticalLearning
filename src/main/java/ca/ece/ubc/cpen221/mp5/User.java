@@ -1,8 +1,10 @@
 package ca.ece.ubc.cpen221.mp5;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
 
 import org.json.simple.JSONObject;
 
@@ -68,16 +70,48 @@ public class User {
 
 	
 	public User(String name) {
+		this.name = name;
+		this.user_id = generateUser_id();
+		this.url = generateDummyURL(user_id);
+		this.votes = generateNewVotesMap();
+		this.review_count = 0; 
+		this.type = "user";
+		this.average_stars = 0.0;
+		this.jsonString = generateJsonString();
+	}
+	
+	private String generateUser_id() {
+		String uniqueID = UUID.randomUUID().toString();
+		uniqueID += name.hashCode();
 		
+		return uniqueID;
 	}
 	
-	private void generateUniqueFields() {
-		//String 
+	private String generateDummyURL(String user_id) {
+		String defaultURL = "http://www.yelp.com/user_details?userid=";
+		return defaultURL + user_id;
 	}
 	
-	private int randomNumberGenrator() {
-		Random rand = new Random(); 
-		return rand.nextInt(10000);
+	private Map<String, Integer> generateNewVotesMap(){
+		Map<String, Integer> map = new HashMap<String, Integer>();
+		map.put("funny", 0);
+		map.put("useful", 0);
+		map.put("cool", 0);
+		
+		return map;
+	}
+	
+	private String generateJsonString() {
+		JSONObject JsonObj = new JSONObject();
+		JsonObj.put("url", this.url);
+		JsonObj.put("votes", this.votes);
+		JsonObj.put("review_count", this.review_count);
+		JsonObj.put("type", this.type);
+		JsonObj.put("user_id", this.user_id);
+		JsonObj.put("name", this.name);
+		JsonObj.put("average_stars", this.average_stars);
+
+		return JsonObj.toString();
 	}
 	
 
@@ -145,14 +179,11 @@ public class User {
 	public Double getAverage_stars() {
 		return average_stars;
 	}
-<<<<<<< HEAD
 	
 	public void updateRating(long newReview) {
 		average_stars = (average_stars*review_count + newReview)/(review_count + 1); 
 		review_count++;
 	}
-	
-=======
 
 	/**
 	 * checks the equality of this User to other
@@ -160,7 +191,6 @@ public class User {
 	 * @param other - Object to be compared to this in terms of equality
 	 * @return boolean - true if other and this are equal 
 	 */
->>>>>>> 91c50f2821654171bda48d21ecc9697513ed5ac4
 	@Override
 	public boolean equals(Object other) {
 		if (other instanceof User) {

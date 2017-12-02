@@ -618,4 +618,10 @@ public class YelpDB implements MP5Db<Restaurant> {
 		users.get(user_id).updateRating(newRating);
 	}
 
+	public String addUser(String name) {
+		User u = new User(name);
+		users.put(u.getUser_id(), u);
+		
+		return u.toString();
+	}
 }
