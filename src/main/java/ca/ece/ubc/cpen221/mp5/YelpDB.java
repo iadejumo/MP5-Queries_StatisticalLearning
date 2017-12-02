@@ -252,6 +252,7 @@ public class YelpDB implements MP5Db<Object> {
 	}
 
 	private boolean emptyClusterIn(Map<Point, Set<Restaurant>> clusterMap) {
+		//only needed for very rare case
 		for (Point centroid : clusterMap.keySet()) {
 			if (clusterMap.get(centroid).isEmpty()) {
 				return true;
@@ -265,7 +266,6 @@ public class YelpDB implements MP5Db<Object> {
 	private boolean newCentroidsFound(Map<Point, Point> newCentroids) {
 		for (Point oldCentroid : newCentroids.keySet()) {
 			if (!oldCentroid.aboutEqual(newCentroids.get(oldCentroid))) {
-				System.out.println("new centroid found");
 				return true;
 			}
 		}
@@ -304,6 +304,15 @@ public class YelpDB implements MP5Db<Object> {
 		}
 		return newCentroids;
 	}
+
+	/*
+	 * private Point getRestaurantLoc() { Restaurant r; Point p = null; int count =
+	 * 0; int aim = (int) (Math.random() * restaurants.size());
+	 * 
+	 * for (String s : restaurants.keySet()) { if (count == aim) { r =
+	 * restaurants.get(s); p = new Point(r.getLatitude(), r.getLongitude()); break;
+	 * } count++; } return p; }
+	 */
 
 	private Point getRestaurantLoc() {
 		Restaurant r;

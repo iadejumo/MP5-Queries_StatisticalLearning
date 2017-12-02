@@ -9,6 +9,7 @@ import ca.ece.ubc.cpen221.mp5.YelpDB;
 
 public class KMeansClusterTest {
 
+	
 	@Test
 	public void test1() {
 		String userFile = "data\\users.json";
@@ -216,25 +217,10 @@ public class KMeansClusterTest {
 		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
 		System.out.println("Done");
 
-		String s = yelpDB.kMeansClusters_json(100);
+		String s = yelpDB.kMeansClusters_json(60);
 		System.out.println(s);
 		
 	}
 	
-	/*
-	@Test 
-	public void test6() {
-		String userFile = "data\\users.json";
-		String restaurantFile = "data\\restaurants.json";
-		String reviewFile = "data\\reviews.json";
-
-		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
-
-		System.out.println("Done");
-
-		String s = yelpDB.kMeansClusters_json(136);
-		System.out.println(s);
-		
-		
-	} */
+	
 }
