@@ -155,15 +155,15 @@ public class YelpDB implements MP5Db<Restaurant> {
 	}
 
 	public Map<String, Restaurant> getRestaurants() {
-		return restaurants;
+		return new HashMap<String, Restaurant>(restaurants);
 	}
 
 	public Map<String, Review> getReviews() {
-		return reviews;
+		return new HashMap<String, Review>(reviews);
 	}
 
 	public Map<String, User> getUsers() {
-		return users;
+		return new HashMap<String, User>(users);
 	}
 
 	// Uncompleted (Part 5)

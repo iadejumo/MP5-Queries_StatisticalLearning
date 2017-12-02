@@ -2,6 +2,9 @@ package ca.ece.ubc.cpen221.mp5.test;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+
+import org.json.simple.parser.ParseException;
 import org.junit.Test;
 
 import ca.ece.ubc.cpen221.mp5.Point;
@@ -11,7 +14,7 @@ public class KMeansClusterTest {
 
 	
 	@Test
-	public void test1() {
+	public void test1() throws ParseException, IOException {
 		String userFile = "data\\users.json";
 		String restaurantFile = "data\\restaurants.json";
 		String reviewFile = "data\\reviews.json";
@@ -61,7 +64,7 @@ public class KMeansClusterTest {
 	}
 
 	@Test
-	public void test2() {
+	public void test2() throws ParseException, IOException {
 		String userFile = "data\\users.json";
 		String restaurantFile = "data\\restaurants.json";
 		String reviewFile = "data\\reviews.json";
@@ -113,7 +116,7 @@ public class KMeansClusterTest {
 	}
 
 	@Test
-	public void test3() {
+	public void test3() throws ParseException, IOException {
 		String userFile = "data\\users.json";
 		String restaurantFile = "data\\restaurants.json";
 		String reviewFile = "data\\reviews.json";
@@ -209,7 +212,7 @@ public class KMeansClusterTest {
 	
 	
 	@Test 
-	public void test5() {
+	public void test5() throws ParseException, IOException {
 		String userFile = "data\\users.json";
 		String restaurantFile = "data\\restaurants.json";
 		String reviewFile = "data\\reviews.json";

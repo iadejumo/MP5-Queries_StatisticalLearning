@@ -65,9 +65,9 @@ public class ExpressionEvalution extends QueryGrammarBaseListener {
 		String finalS = ctx.string().getText();
 		System.out.println(finalS);
 		
-		List <String> list = YelpDB.restaurants.keySet().stream().filter(x -> YelpDB.restaurants.get(x).getNeighborhoods().contains(finalS)).collect(Collectors.toList());
+		//List <String> list = YelpDB.restaurants.keySet().stream().filter(x -> YelpDB.restaurants.get(x).getNeighborhoods().contains(finalS)).collect(Collectors.toList());
 		//System.out.println(ctx.string().WORD());
-		System.out.println(list);
+		//System.out.println(list);
 	}
 	/**
 	 * {@inheritDoc}
@@ -108,7 +108,7 @@ public class ExpressionEvalution extends QueryGrammarBaseListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterName(QueryGrammarParser.NameContext ctx) {
+	/*@Override public void enterName(QueryGrammarParser.NameContext ctx) {
 		List<TerminalNode> l = ctx.string().WORD();
 		String initS = "";
 		String ws = " ";
@@ -121,10 +121,10 @@ public class ExpressionEvalution extends QueryGrammarBaseListener {
 		
 		System.out.println(finalS);
 		
-		List <String> list = YelpDB.restaurants.keySet().stream().filter(x -> YelpDB.restaurants.get(x).getCategories().contains(finalS)).collect(Collectors.toList());
-		System.out.println(ctx.string().WORD());
-		System.out.println(list);
-	}
+		//List <String> list = YelpDB.restaurants.keySet().stream().filter(x -> YelpDB.restaurants.get(x).getCategories().contains(finalS)).collect(Collectors.toList());
+		//System.out.println(ctx.string().WORD());
+		//System.out.println(list);
+	}*/
 	/**
 	 * {@inheritDoc}
 	 *
