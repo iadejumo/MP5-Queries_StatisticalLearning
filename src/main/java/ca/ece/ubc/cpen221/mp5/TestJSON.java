@@ -4,11 +4,14 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.function.ToDoubleBiFunction;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+
+import antlr.TokenStream;
 
 
 public class TestJSON {
@@ -22,16 +25,19 @@ public class TestJSON {
 				
 		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
 		
-		ToDoubleBiFunction<YelpDB, String> predictor = yelpDB.getPredictorFunction("dRSz0aNLiHOPp4sU5dms5g");
-		double predicted = predictor.applyAsDouble(yelpDB, "8leHSCn0DCa1ilxfbHuCQA");
+		ToDoubleBiFunction<MP5Db<Restaurant>, String> predictor = yelpDB.getPredictorFunction("fL8ujZ89qTyhbjr1Qz5aSg");
+		double predicted = predictor.applyAsDouble(yelpDB, "P2XKcDLVHUuOdGNBQtMFRQ");
 		
+		String s = "in(Telegraph Ave) && (category(Chinese) || category(Italian)) && price <= 2";
+		
+		yelpDB.parseInput(s);
 		System.out.println(predicted);
 		
     }
 	
 	public static void readJsonFile() {
 
-        BufferedReader br =null;
+        BufferedReader br = null;
         JSONParser parser = new JSONParser();
 
         try {

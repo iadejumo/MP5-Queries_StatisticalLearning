@@ -2,6 +2,7 @@ plugins {
   id 'com.github.kt3k.coveralls' version '2.6.3'
 }
 
+apply plugin: 'antlr'
 apply plugin: 'java'
 apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
@@ -26,6 +27,11 @@ dependencies {
 	
 	// https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple
 	compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1'
+
+	
+	//antlr "org.antlr:antlr4:4.7"
+	//compile "org.antlr:antlr4-runtime:4.7"
+	//testCompile 'junit:junit:4.12'
 	
 }
 
@@ -43,3 +49,9 @@ jacocoTestReport {
         // xml.destination "${buildDir}/reports/coverage"
     }
 }
+
+generateGrammarSource {
+    outputDirectory = file("src/main/java/ca/ece/ubc/cpen221/mp5")
+}
+
+ 
