@@ -59,10 +59,19 @@ public class YelpDB implements MP5Db<Restaurant> {
 	private Map<String, List<String>> userToRestaurant;
 
 	/**
-	 * Perform a structured query and return the set of objects that matches the
-	 * query
+	 * Initializes and constructs the database. And establishes the relationships
+	 * between entries in the database
 	 * 
-	 * @param Stron
+	 * @param restaurantFilename
+	 *            the location and filename of the restaurant file in json format
+	 * @param reviewFilename
+	 *            the location and filename of the review file in json format
+	 * @param userFilename
+	 *            the location and filename of the user file in json format
+	 * @throws ParseException
+	 *             if an error has been reached unexpectedly while parsing.
+	 * @throws IOException
+	 *             if the file could not be found or opened
 	 */
 	public YelpDB(String restaurantFilename, String reviewFilename, String userFilename)
 			throws ParseException, IOException {
@@ -77,6 +86,16 @@ public class YelpDB implements MP5Db<Restaurant> {
 		establishRelationships();
 	}
 
+	/**
+	 * Creates and initializes the restaurant database, and entries.
+	 * 
+	 * @param restaurantFilename
+	 *            the location and filename of the restaurant file in json format
+	 * @throws ParseException
+	 *             if an error has been reached unexpectedly while parsing.
+	 * @throws IOException
+	 *             if the file could not be found or opened
+	 */
 	private void createRestaurantDB(String restaurantFilename) throws ParseException, IOException {
 		BufferedReader restaurantBR = null;
 		JSONParser parser = new JSONParser();
@@ -99,6 +118,16 @@ public class YelpDB implements MP5Db<Restaurant> {
 
 	}
 
+	/**
+	 * Creates and initializes the review database, and entries.
+	 * 
+	 * @param reviewFilename
+	 *            the location and filename of the review file in json format
+	 * @throws IOException
+	 *             if an error has been reached unexpectedly while parsing.
+	 * @throws ParseException
+	 *             if the file could not be found or opened
+	 */
 	private void createReviewDB(String reviewFilename) throws IOException, ParseException {
 		BufferedReader reviewBR = null;
 		JSONParser parser = new JSONParser();
@@ -123,6 +152,16 @@ public class YelpDB implements MP5Db<Restaurant> {
 
 	}
 
+	/**
+	 * Creates and initializes the user database, and entries.
+	 * 
+	 * @param userFilename
+	 *            the location and filename of the user file in json format
+	 * @throws IOException
+	 *             if an error has been reached unexpectedly while parsing.
+	 * @throws ParseException
+	 *             if the file could not be found or opened
+	 */
 	private void createUserDB(String userFilename) throws IOException, ParseException {
 		BufferedReader userBR = null;
 		JSONParser parser = new JSONParser();
@@ -145,6 +184,13 @@ public class YelpDB implements MP5Db<Restaurant> {
 		userBR.close();
 	}
 
+	/**
+	 * Establishes relationships between the different entries in the database by
+	 * initializing and storing a map that links the different key field(unique) in
+	 * the different databases. i.e; user_id -> review_id, business_id -> review_id,
+	 * user_id -> business_id
+	 * 
+	 */
 	private void establishRelationships() {
 		userToReview = new HashMap<String, List<String>>();
 		restaurantToReview = new HashMap<String, List<String>>();
@@ -179,20 +225,40 @@ public class YelpDB implements MP5Db<Restaurant> {
 
 	}
 
+	/**
+	 * Returns the map containing an unmodifiable map and business_ids mapped to
+	 * Restaurant objects
+	 * 
+	 * @return the map containing an unmodifiable map and business_ids mapped to
+	 *         Restaurant objects
+	 */
 	public Map<String, Restaurant> getRestaurants() {
 		return new HashMap<String, Restaurant>(restaurants);
 	}
-
+	
+	/**
+	 * Returns the map containing an unmodifiable map and review_ids mapped to
+	 * Review objects
+	 * 
+	 * @return the map containing an unmodifiable map and review_ids mapped to
+	 *         Review objects
+	 */
 	public Map<String, Review> getReviews() {
 		return new HashMap<String, Review>(reviews);
 	}
-
+	
+	/**
+	 * Returns the map containing an unmodifiable map and user_ids mapped to
+	 * User objects
+	 * 
+	 * @return the map containing an unmodifiable map and user_ids mapped to
+	 *         User objects
+	 */
 	public Map<String, User> getUsers() {
 		return new HashMap<String, User>(users);
 	}
 
 	// Uncompleted (Part 5)
-
 	@Override
 	public Set getMatches(String queryString) {
 		// TODO Auto-generated method stub
@@ -200,7 +266,6 @@ public class YelpDB implements MP5Db<Restaurant> {
 	}
 
 	// Uncompleted (Part 5)
-
 	private void parseInput(String input) {
 		CharStream stream = new ANTLRInputStream(input);
 

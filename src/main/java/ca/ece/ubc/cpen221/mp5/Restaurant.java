@@ -34,6 +34,7 @@ public class Restaurant {
 	private List<String> schools;
 	private double latitude;
 	private long price;
+	private String jsonString;
 
 	/**
 	 * Creates a Restaurant object
@@ -91,6 +92,7 @@ public class Restaurant {
 		this.schools = (List<String>) restaurant.get("schools");
 		this.latitude = (Double) restaurant.get("latitude");
 		this.price = (long) restaurant.get("price");
+		this.jsonString = restaurant.toString();
 	}
 
 	/**
@@ -247,6 +249,26 @@ public class Restaurant {
 	 */
 	public long getPrice() {
 		return price;
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (other instanceof Restaurant) {
+			Restaurant otherRes = (Restaurant) other;
+			return (this.business_id.equals(otherRes.business_id));
+		} else {
+			return false;
+		}
+	}
+	
+	@Override
+	public int hashCode() {
+		return business_id.hashCode();
+	}
+	
+	@Override
+	public String toString() {
+		return jsonString;
 	}
 
 }

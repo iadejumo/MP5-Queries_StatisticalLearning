@@ -14,6 +14,7 @@ public class Review {
 	private long stars;
 	private String user_id;
 	private String date;
+	private String jsonString;
 	
 	public Review(JSONObject review) {
 		this.type = (String) review.get("type");
@@ -24,6 +25,7 @@ public class Review {
 		this.stars = (long) review.get("stars");
 		this.user_id = (String) review.get("user_id");
 		this.date = (String) review.get("date");
+		this.jsonString = review.toString();
 	}
 	
 	public String getType() {
@@ -49,5 +51,24 @@ public class Review {
 	}
 	public String getDate() {
 		return date;
+	}
+	@Override
+	public boolean equals(Object other) {
+		if (other instanceof Review) {
+			Review otherRes = (Review) other;
+			return (this.review_id.equals(otherRes.review_id));
+		} else {
+			return false;
+		}
+	}
+	
+	@Override
+	public int hashCode() {
+		return review_id.hashCode();
+	}
+	
+	@Override
+	public String toString() {
+		return jsonString;
 	}
 }

@@ -14,6 +14,7 @@ public class User {
 	private String user_id;
 	private String name;
 	private Double average_stars;
+	private String jsonString;
 	
 	public User(JSONObject user) {
 		this.url = (String) user.get("url");
@@ -23,6 +24,7 @@ public class User {
 		this.user_id = (String) user.get("user_id");
 		this.name = (String) user.get("name");
 		this.average_stars = (Double) user.get("average_stars");
+		this.jsonString = user.toString();
 	}
 	
 	public String getUrl() {
@@ -45,5 +47,25 @@ public class User {
 	}
 	public Double getAverage_stars() {
 		return average_stars;
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		if (other instanceof User) {
+			User otherRes = (User) other;
+			return (this.user_id.equals(otherRes.user_id));
+		} else {
+			return false;
+		}
+	}
+	
+	@Override
+	public int hashCode() {
+		return user_id.hashCode();
+	}
+	
+	@Override
+	public String toString() {
+		return jsonString;
 	}
 }
