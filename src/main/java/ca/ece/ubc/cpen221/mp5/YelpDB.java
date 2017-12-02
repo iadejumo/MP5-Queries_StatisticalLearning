@@ -612,5 +612,10 @@ public class YelpDB implements MP5Db<Restaurant> {
 
 		return predictor;
 	}
+	
+	private void updateRatingsAndRatingsCount(String business_id, String user_id, long newRating) {
+		restaurants.get(business_id).updateRating(newRating);		
+		users.get(user_id).updateRating(newRating);
+	}
 
 }

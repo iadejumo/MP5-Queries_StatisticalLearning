@@ -2,6 +2,7 @@ package ca.ece.ubc.cpen221.mp5;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Random;
 
 import org.json.simple.JSONObject;
 
@@ -27,6 +28,19 @@ public class User {
 		this.jsonString = user.toString();
 	}
 	
+	public User(String name) {
+		
+	}
+	
+	private void generateUniqueFields() {
+		String 
+	}
+	
+	private int randomNumberGenrator() {
+		Random rand = new Random(); 
+		return rand.nextInt(10000);
+	}
+	
 	public String getUrl() {
 		return url;
 	}
@@ -47,6 +61,11 @@ public class User {
 	}
 	public Double getAverage_stars() {
 		return average_stars;
+	}
+	
+	public void updateRating(long newReview) {
+		average_stars = (average_stars*review_count + newReview)/(review_count + 1); 
+		review_count++;
 	}
 	
 	@Override

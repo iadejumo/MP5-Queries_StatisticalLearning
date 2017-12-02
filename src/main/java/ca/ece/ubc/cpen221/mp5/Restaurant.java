@@ -129,6 +129,11 @@ public class Restaurant {
 		return price;
 	}
 
+	public void updateRating(long newReview) {
+		stars = (stars*review_count + newReview)/(review_count + 1); 
+		review_count++;
+	}
+	
 	@Override
 	public boolean equals(Object other) {
 		if (other instanceof Restaurant) {
