@@ -26,6 +26,28 @@ import org.json.simple.parser.ParseException;
 
 public class YelpDB implements MP5Db<Restaurant> {
 
+	/*
+	 * Abstraction function: restaurants x reviews x users
+	 * 
+	 * Representation Invariants: 
+	 * all Restaurants in restaurants have different business_id's
+	 * all Users in users have different user_id's 
+	 * all Reviews in reviews have different review_id's
+	 * all keys in userToReview are user_id's that map to a list of all review_id's that have the same user_id
+	 * all keys in userToRestaurant are user_id's that map to a list of all business_id's of restaurants that these users have reviewed
+	 * all keys in restaurantToReview are business_id's that map to a list of all review_id's that have the business_id's
+	 * all of the Strings in userToReview/restaurantToReview/userToRestaurant are business_ids/review_ids/user_ids
+	 * which leads to
+	 * restaurantToReview.size() == restaurants.size()
+	 * userToReview.size() == users.size() == userToRestaurant.size()
+	 * 
+	 * 
+	 * Note: review.size()/review_count/votes/average_stars/stars do not have to sum
+	 * up in any way, as reviews and votes could be done to non-restaurant
+	 * reviewable objects
+	 * 
+	 * 
+	 */
 	private Map<String, Restaurant> restaurants;
 	private Map<String, Review> reviews;
 	private Map<String, User> users;
@@ -313,24 +335,12 @@ public class YelpDB implements MP5Db<Restaurant> {
 		// Centroids to the average of the cluster
 		// stop when the update to the new centroids doesn't change any of the centroids
 
-		KMeansVisualizer vis = new KMeansVisualizer();
-		vis.setDelay(1000);
-
 		do {
 			clusterMap = updateClusterMap(updatedCentroids);
 			findClosestRestaurants(clusterMap);
-
-			for (Point centroid : clusterMap.keySet()) {
-				vis.beginCluster(centroid.latitude, centroid.longitude);
-				for (Restaurant r : clusterMap.get(centroid))
-					vis.addPoint(r.getLatitude(), r.getLongitude());
-			}
-
-			vis.show();
 			updatedCentroids = findNewCentroids(clusterMap);
 			// } while (newCentroidsFound(updatedCentroids) );
 		} while (newCentroidsFound(updatedCentroids) || emptyClusterIn(clusterMap));
-		vis.close();
 
 		// convert the clusterMap to a clusterList
 		List<Set<Restaurant>> clusterList = new ArrayList<Set<Restaurant>>();
