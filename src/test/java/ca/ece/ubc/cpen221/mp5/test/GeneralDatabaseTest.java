@@ -13,9 +13,9 @@ import ca.ece.ubc.cpen221.mp5.YelpDB;
 
 public class GeneralDatabaseTest {
 
-	String userFile = "data\\users.json";
-	String restaurantFile = "data\\restaurants.json";
-	String reviewFile = "data\\reviews.json";
+	String userFile = "data/users.json";
+	String restaurantFile = "data/restaurants.json";
+	String reviewFile = "data/reviews.json";
 
 	@Test
 	public void test1() throws ParseException, IOException {

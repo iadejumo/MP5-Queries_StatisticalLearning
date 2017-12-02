@@ -11,13 +11,13 @@ import ca.ece.ubc.cpen221.mp5.Point;
 import ca.ece.ubc.cpen221.mp5.YelpDB;
 
 public class KMeansClusterTest {
+	String userFile = "data/users.json";
+	String restaurantFile = "data/restaurants.json";
+	String reviewFile = "data/reviews.json";
 
 	
 	@Test
 	public void test1() throws ParseException, IOException {
-		String userFile = "data\\users.json";
-		String restaurantFile = "data\\restaurants.json";
-		String reviewFile = "data\\reviews.json";
 
 		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
 
@@ -65,9 +65,6 @@ public class KMeansClusterTest {
 
 	@Test
 	public void test2() throws ParseException, IOException {
-		String userFile = "data\\users.json";
-		String restaurantFile = "data\\restaurants.json";
-		String reviewFile = "data\\reviews.json";
 
 		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
 
@@ -117,9 +114,6 @@ public class KMeansClusterTest {
 
 	@Test
 	public void test3() throws ParseException, IOException {
-		String userFile = "data\\users.json";
-		String restaurantFile = "data\\restaurants.json";
-		String reviewFile = "data\\reviews.json";
 
 		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
 
@@ -213,9 +207,6 @@ public class KMeansClusterTest {
 	
 	@Test 
 	public void test5() throws ParseException, IOException {
-		String userFile = "data\\users.json";
-		String restaurantFile = "data\\restaurants.json";
-		String reviewFile = "data\\reviews.json";
 
 		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
 		System.out.println("Done");
