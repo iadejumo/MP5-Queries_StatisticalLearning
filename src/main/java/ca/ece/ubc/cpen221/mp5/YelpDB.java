@@ -3,7 +3,6 @@ package ca.ece.ubc.cpen221.mp5;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -14,13 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.ToDoubleBiFunction;
-import java.util.stream.Stream;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.Parser;
-import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -30,17 +26,18 @@ import org.json.simple.parser.ParseException;
 
 public class YelpDB implements MP5Db<Restaurant> {
 
-	private Map<String, Restaurant> restaurants;	
+	private Map<String, Restaurant> restaurants;
 	private Map<String, Review> reviews;
 	private Map<String, User> users;
-	
+
 	private Map<String, List<String>> userToReview;
 	private Map<String, List<String>> restaurantToReview;
 	private Map<String, List<String>> userToRestaurant;
-	
+
 	private static final double WEIGHT = 2.0;
 
-	public YelpDB(String restaurantFilename, String reviewFilename, String userFilename) {
+	public YelpDB(String restaurantFilename, String reviewFilename, String userFilename)
+			throws ParseException, IOException {
 		restaurants = new HashMap<String, Restaurant>();
 		reviews = new HashMap<String, Review>();
 		users = new HashMap<String, User>();
@@ -48,178 +45,135 @@ public class YelpDB implements MP5Db<Restaurant> {
 		createRestaurantDB(restaurantFilename);
 		createReviewDB(reviewFilename);
 		createUserDB(userFilename);
-		
+
 		establishRelationships();
 
 	}
 
-	private void createRestaurantDB(String restaurantFilename) {
+	private void createRestaurantDB(String restaurantFilename) throws ParseException, IOException {
 		BufferedReader restaurantBR = null;
 		JSONParser parser = new JSONParser();
 
-		try {
-			String sCurrentLine;
+		String sCurrentLine;
 
-			restaurantBR = new BufferedReader(new FileReader(restaurantFilename));
+		restaurantBR = new BufferedReader(new FileReader(restaurantFilename));
 
-			while ((sCurrentLine = restaurantBR.readLine()) != null) {
+		while ((sCurrentLine = restaurantBR.readLine()) != null) {
 
-				Object obj;
-				try {
-					obj = parser.parse(sCurrentLine);
-					JSONObject jsonObject = (JSONObject) obj;
+			Object obj;
+			obj = parser.parse(sCurrentLine);
+			JSONObject jsonObject = (JSONObject) obj;
 
-					Restaurant r = new Restaurant(jsonObject);
-					restaurants.put(r.getBusiness_id(), r);
-
-				} catch (ParseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (restaurantBR != null)
-					restaurantBR.close();
-			} catch (IOException ex) {
-				ex.printStackTrace();
-			}
+			Restaurant r = new Restaurant(jsonObject);
+			restaurants.put(r.getBusiness_id(), r);
 		}
+
+		restaurantBR.close();
+
 	}
 
-	private void createReviewDB(String reviewFilename) {
+	private void createReviewDB(String reviewFilename) throws IOException, ParseException {
 		BufferedReader reviewBR = null;
 		JSONParser parser = new JSONParser();
 
-		try {
-			String sCurrentLine;
+		String sCurrentLine;
 
-			reviewBR = new BufferedReader(new FileReader(reviewFilename));
+		reviewBR = new BufferedReader(new FileReader(reviewFilename));
 
-			while ((sCurrentLine = reviewBR.readLine()) != null) {
+		while ((sCurrentLine = reviewBR.readLine()) != null) {
 
-				Object obj;
-				try {
-					obj = parser.parse(sCurrentLine);
-					JSONObject jsonObject = (JSONObject) obj;
+			Object obj;
 
-					Review r = new Review(jsonObject);
-					reviews.put(r.getReview_id(), r);
+			obj = parser.parse(sCurrentLine);
+			JSONObject jsonObject = (JSONObject) obj;
 
-				} catch (ParseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
+			Review r = new Review(jsonObject);
+			reviews.put(r.getReview_id(), r);
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (reviewBR != null)
-					reviewBR.close();
-			} catch (IOException ex) {
-				ex.printStackTrace();
-			}
 		}
+
+		reviewBR.close();
+
 	}
 
-	private void createUserDB(String userFilename) {
+	private void createUserDB(String userFilename) throws IOException, ParseException {
 		BufferedReader userBR = null;
 		JSONParser parser = new JSONParser();
 
-		try {
-			String sCurrentLine;
+		String sCurrentLine;
 
-			userBR = new BufferedReader(new FileReader(userFilename));
+		userBR = new BufferedReader(new FileReader(userFilename));
 
-			while ((sCurrentLine = userBR.readLine()) != null) {
+		while ((sCurrentLine = userBR.readLine()) != null) {
 
-				Object obj;
-				try {
-					obj = parser.parse(sCurrentLine);
-					JSONObject jsonObject = (JSONObject) obj;
+			Object obj;
+			obj = parser.parse(sCurrentLine);
+			JSONObject jsonObject = (JSONObject) obj;
 
-					User u = new User(jsonObject);
-					users.put(u.getUser_id(), u);
+			User u = new User(jsonObject);
+			users.put(u.getUser_id(), u);
 
-				} catch (ParseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (userBR != null)
-					userBR.close();
-			} catch (IOException ex) {
-				ex.printStackTrace();
-			}
 		}
+
+		userBR.close();
 
 	}
 
 	private void establishRelationships() {
-		userToReview = new HashMap<String, List<String>> ();
-		restaurantToReview = new HashMap<String, List<String>> ();
-		userToRestaurant = new HashMap<String, List<String>> ();
-		
-		//Establishes user to review relationship
-		for(String user: users.keySet()) {
+		userToReview = new HashMap<String, List<String>>();
+		restaurantToReview = new HashMap<String, List<String>>();
+		userToRestaurant = new HashMap<String, List<String>>();
+
+		// Establishes user to review relationship
+		for (String user : users.keySet()) {
 			userToReview.put(user, new ArrayList<String>());
 		}
-		
-		for(Review review: reviews.values()) {
+
+		for (Review review : reviews.values()) {
 			userToReview.get(review.getUser_id()).add(review.getReview_id());
 		}
-		
-		//Establish restaurants to review relationship
-		for(String restaurant: restaurants.keySet()) {
+
+		// Establish restaurants to review relationship
+		for (String restaurant : restaurants.keySet()) {
 			restaurantToReview.put(restaurant, new ArrayList<String>());
 		}
-		
-		for(Review review: reviews.values()) {
+
+		for (Review review : reviews.values()) {
 			restaurantToReview.get(review.getBusiness_id()).add(review.getReview_id());
 		}
-		
-		//Establish user to restaurant relationship
-		for(String user: users.keySet()) {
+
+		// Establish user to restaurant relationship
+		for (String user : users.keySet()) {
 			userToRestaurant.put(user, new ArrayList<String>());
 		}
-		
-		for(Review review: reviews.values()) {
+
+		for (Review review : reviews.values()) {
 			userToRestaurant.get(review.getUser_id()).add(review.getBusiness_id());
 		}
-		
+
 	}
-	
-	public Map<String, Restaurant> getRestaurants(){
+
+	public Map<String, Restaurant> getRestaurants() {
 		return restaurants;
 	}
-	
-	public Map<String, Review> getReviews(){
+
+	public Map<String, Review> getReviews() {
 		return reviews;
 	}
-	
-	public Map<String, User> getUsers(){
+
+	public Map<String, User> getUsers() {
 		return users;
 	}
-	
-	//Uncompleted (Part 5)
-	
+
+	// Uncompleted (Part 5)
+
 	@Override
 	public Set getMatches(String queryString) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	//Uncompleted (Part 5)
+
+	// Uncompleted (Part 5)
 
 	private void parseInput(String input) {
 		CharStream stream = new ANTLRInputStream(input);
@@ -545,14 +499,14 @@ public class YelpDB implements MP5Db<Restaurant> {
 		double b = sxy / sxx;
 		double a = meanY - b * meanX;
 		double r_squared = Math.pow(sxy, 2) / (sxx * syy);
-		
+
 		ToDoubleBiFunction<MP5Db<Restaurant>, String> predictor = new ToDoubleBiFunctionModified(a, b);
-		
-		//TODO : Delete block of code below;
+
+		// TODO : Delete block of code below;
 		System.out.println(a + "\n" + xList + "\n" + yList);
-		//ToDoubleBiFunction<MP5Db<Restaurant>, String> predictor = (yelpDB,
-				//restaurant) -> ((((YelpDB) yelpDB).restaurants.get(restaurant).getPrice()) * b + a);
-		
+		// ToDoubleBiFunction<MP5Db<Restaurant>, String> predictor = (yelpDB,
+		// restaurant) -> ((((YelpDB) yelpDB).restaurants.get(restaurant).getPrice()) *
+		// b + a);
 
 		return predictor;
 	}

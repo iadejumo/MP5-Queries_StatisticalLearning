@@ -2,14 +2,16 @@ package ca.ece.ubc.cpen221.mp5;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.util.function.ToDoubleBiFunction;
 
+import org.json.simple.parser.ParseException;
 import org.junit.Test;
 
 public class GetPredictorTests {
 	
 	@Test
-	public void test0() {
+	public void test0() throws ParseException, IOException {
 		String userFile = "data\\users.json";
 		String restaurantFile = "data\\restaurants.json";
 		String reviewFile = "data\\reviews.json";
@@ -18,7 +20,7 @@ public class GetPredictorTests {
 	}
 
 	@Test
-	public void test1() {
+	public void test1() throws ParseException, IOException {
 		String userFile = "data\\users.json";
 		String restaurantFile = "data\\restaurants.json";
 		String reviewFile = "data\\reviews.json";
@@ -48,7 +50,7 @@ public class GetPredictorTests {
 	}
 	
 	@Test
-	public void test2() {
+	public void test2() throws ParseException, IOException {
 		String userFile = "data\\users.json";
 		String restaurantFile = "data\\restaurants.json";
 		String reviewFile = "data\\reviews.json";
@@ -69,7 +71,7 @@ public class GetPredictorTests {
 	}
 	
 	@Test (expected = IllegalArgumentException.class)
-	public void Test6() {
+	public void Test6() throws ParseException, IOException {
 		String userFile = "data\\users.json";
 		String restaurantFile = "data\\restaurants.json";
 		String reviewFile = "data\\reviews.json";
