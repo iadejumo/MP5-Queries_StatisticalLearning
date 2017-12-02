@@ -24,17 +24,20 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+
+
 public class YelpDB implements MP5Db<Restaurant> {
 
 	private Map<String, Restaurant> restaurants;
 	private Map<String, Review> reviews;
 	private Map<String, User> users;
 
+	private static final double WEIGHT = 2.0;
+
 	private Map<String, List<String>> userToReview;
 	private Map<String, List<String>> restaurantToReview;
 	private Map<String, List<String>> userToRestaurant;
 
-	private static final double WEIGHT = 2.0;
 
 	public YelpDB(String restaurantFilename, String reviewFilename, String userFilename)
 			throws ParseException, IOException {
@@ -45,9 +48,8 @@ public class YelpDB implements MP5Db<Restaurant> {
 		createRestaurantDB(restaurantFilename);
 		createReviewDB(reviewFilename);
 		createUserDB(userFilename);
-
+		
 		establishRelationships();
-
 	}
 
 	private void createRestaurantDB(String restaurantFilename) throws ParseException, IOException {
@@ -116,7 +118,6 @@ public class YelpDB implements MP5Db<Restaurant> {
 		}
 
 		userBR.close();
-
 	}
 
 	private void establishRelationships() {
@@ -154,15 +155,15 @@ public class YelpDB implements MP5Db<Restaurant> {
 	}
 
 	public Map<String, Restaurant> getRestaurants() {
-		return restaurants;
+		return new HashMap<String, Restaurant>(restaurants);
 	}
 
 	public Map<String, Review> getReviews() {
-		return reviews;
+		return new HashMap<String, Review>(reviews);
 	}
 
 	public Map<String, User> getUsers() {
-		return users;
+		return new HashMap<String, User>(users);
 	}
 
 	// Uncompleted (Part 5)
@@ -216,7 +217,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 		String jsonFormat = "";
 
 		// for each Restaurant in each cluster, create a JSONObject with the necessary
-		// fields, then convert the JSONObject to String format
+		// fields, then convert the JSONObject to String format, then add it to String
 		for (int clusterNum = 0; clusterNum < clusterList.size(); clusterNum++) {
 			for (Restaurant r : clusterList.get(clusterNum)) {
 				JSONObject obj = new JSONObject();
@@ -233,21 +234,35 @@ public class YelpDB implements MP5Db<Restaurant> {
 
 	// finds k clusters of restaurants
 	private List<Set<Restaurant>> findClusters(int k) {
-		// create map connecting a random centroid point -> a set of restaurants nearest
-		// to it
-		Map<Point, Set<Restaurant>> clusterMap = new HashMap<Point, Set<Restaurant>>();
-		for (int i = 0; i < k; i++)
-			clusterMap.put(generateRandomPointInRange(), new HashSet<Restaurant>());
 
-		// continuously find closest restaurants to the centroid points, then update the
+		// map connecting a centroid point -> a set of restaurants nearest to it
+		Map<Point, Set<Restaurant>> clusterMap;
+
+		// contains the first set of random Centroid points
+		Map<Point, Point> updatedCentroids = firstCentroids(k);
+
+		// continuously find closest restaurants to the centroids, then update the
 		// Centroids to the average of the cluster
-		// stop when the update to the new average does not change any of the centroid
-		// points
-		Map<Point, Point> updatedCentroids;
+		// stop when the update to the new centroids doesn't change any of the centroids
+
+		KMeansVisualizer vis = new KMeansVisualizer();
+		vis.setDelay(1000);
+
 		do {
+			clusterMap = updateClusterMap(updatedCentroids);
 			findClosestRestaurants(clusterMap);
+
+			for (Point centroid : clusterMap.keySet()) {
+				vis.beginCluster(centroid.latitude, centroid.longitude);
+				for (Restaurant r : clusterMap.get(centroid))
+					vis.addPoint(r.getLatitude(), r.getLongitude());
+			}
+
+			vis.show();
 			updatedCentroids = findNewCentroids(clusterMap);
-		} while (newCentroidsFoundOrNot(updatedCentroids));
+			// } while (newCentroidsFound(updatedCentroids) );
+		} while (newCentroidsFound(updatedCentroids) || emptyClusterIn(clusterMap));
+		vis.close();
 
 		// convert the clusterMap to a clusterList
 		List<Set<Restaurant>> clusterList = new ArrayList<Set<Restaurant>>();
@@ -256,12 +271,45 @@ public class YelpDB implements MP5Db<Restaurant> {
 		return clusterList;
 	}
 
+	// generates first Centroid points from k restaurants
+	private Map<Point, Point> firstCentroids(int k) {
+		Map<Point, Point> updatedCentroids = new HashMap<Point, Point>();
+
+		// create k Points at restaurants
+		for (int i = 0; i < k; i++)
+			updatedCentroids.put(new Point(i, i), getRestaurantLoc());
+
+		return updatedCentroids;
+	}
+
+	// returns a new Map<Point,Set<Restaurant>> that has the Point keys as the
+	// updatedCentroid points -> new HashSet<Restaurant>
+	private Map<Point, Set<Restaurant>> updateClusterMap(Map<Point, Point> updatedCentroids) {
+		Map<Point, Set<Restaurant>> newClusterMap = new HashMap<Point, Set<Restaurant>>();
+
+		for (Point oldCentroid : updatedCentroids.keySet())
+			newClusterMap.put(updatedCentroids.get(oldCentroid), new HashSet<Restaurant>());
+
+		return newClusterMap;
+	}
+
+	private boolean emptyClusterIn(Map<Point, Set<Restaurant>> clusterMap) {
+		//only needed for very rare case
+		for (Point centroid : clusterMap.keySet()) {
+			if (clusterMap.get(centroid).isEmpty()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	// returns true if at least one centroid point has changed
 	// returns false if no centroid points are changed
-	private boolean newCentroidsFoundOrNot(Map<Point, Point> newCentroids) {
+	private boolean newCentroidsFound(Map<Point, Point> newCentroids) {
 		for (Point oldCentroid : newCentroids.keySet()) {
-			if (!oldCentroid.aboutEqual(newCentroids.get(oldCentroid)))
+			if (!oldCentroid.aboutEqual(newCentroids.get(oldCentroid))) {
 				return true;
+			}
 		}
 		return false;
 	}
@@ -275,25 +323,57 @@ public class YelpDB implements MP5Db<Restaurant> {
 		// of its nearest restaurants
 		// use this to find a newCentroid Point
 		for (Point centroidLoc : clusterMap.keySet()) {
-			Iterator<Restaurant> itr = clusterMap.get(centroidLoc).iterator();
 			int size = clusterMap.get(centroidLoc).size();
-			double averageLat = 0;
-			double averageLong = 0;
+			if (size != 0) {
+				double averageLat = 0;
+				double averageLong = 0;
 
-			// calculate the averageLatitude and averageLongitude and then set newCentroid
-			// Point to that location
-			while (itr.hasNext()) {
-				Restaurant r = itr.next();
-				averageLat += r.getLatitude();
-				averageLong += r.getLongitude();
+				// calculate the averageLatitude and averageLongitude and then set newCentroid
+				// Point to that location
+				for (Restaurant r : clusterMap.get(centroidLoc)) {
+					averageLat += r.getLatitude();
+					averageLong += r.getLongitude();
+				}
+
+				averageLat = averageLat / size;
+				averageLong = averageLong / size;
+				newCentroids.put(centroidLoc, new Point(averageLat, averageLong));
 			}
-			averageLat = averageLat / size;
-			averageLong = averageLong / size;
-			newCentroids.put(centroidLoc, new Point(averageLat, averageLong));
+
+			// else put centroid at another restaurant location
+			else
+				newCentroids.put(centroidLoc, getRestaurantLoc());
 		}
 		return newCentroids;
 	}
 
+	/*
+	 * private Point getRestaurantLoc() { Restaurant r; Point p = null; int count =
+	 * 0; int aim = (int) (Math.random() * restaurants.size());
+	 * 
+	 * for (String s : restaurants.keySet()) { if (count == aim) { r =
+	 * restaurants.get(s); p = new Point(r.getLatitude(), r.getLongitude()); break;
+	 * } count++; } return p; }
+	 */
+
+	private Point getRestaurantLoc() {
+		Restaurant r;
+		Point p = null;
+		int count = 0;
+		int aim = (int) (Math.random() * restaurants.size());
+
+		for (String s : restaurants.keySet()) {
+			if (count == aim) {
+				r = restaurants.get(s);
+				p = new Point(r.getLatitude(), r.getLongitude());
+				break;
+			}
+			count++;
+		}
+		return p;
+	}
+
+	// modifies clusterMap's Set<Restaurant>
 	private void findClosestRestaurants(Map<Point, Set<Restaurant>> clusterMap) {
 
 		// for each restaurant, find the closest centroid Point to it
@@ -302,7 +382,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 		for (String business_id : restaurants.keySet()) {
 			Restaurant r = restaurants.get(business_id);
 			Point restaurantLoc = new Point(r.getLatitude(), r.getLongitude());
-			double minDist = Double.MAX_VALUE;
+			double minDist = Double.POSITIVE_INFINITY;
 			Point closestCentroid = null;
 
 			// find the centroid Point that restaurant is closest to
@@ -318,63 +398,6 @@ public class YelpDB implements MP5Db<Restaurant> {
 		}
 	}
 
-	private Point generateRandomPointInRange() {
-		double maxLongitude = maxLongitude();
-		double minLongitude = minLongitude();
-		double maxLatitude = maxLatitude();
-		double minLatitude = minLatitude();
-
-		double diffLong = maxLongitude - minLongitude;
-		double diffLat = maxLatitude - minLatitude;
-		double randLongitude = Math.random() * diffLong + minLongitude;
-		double randLatitude = Math.random() * diffLat + minLatitude;
-		return new Point(randLatitude, randLongitude);
-	}
-
-	private double maxLongitude() {
-		double maxLongitude = Double.MIN_VALUE;
-		double longitude;
-		for (String restName : restaurants.keySet()) {
-			longitude = restaurants.get(restName).getLongitude();
-			if (maxLongitude < longitude)
-				maxLongitude = longitude;
-		}
-		return maxLongitude;
-	}
-
-	private double minLongitude() {
-		double minLongitude = Double.MAX_VALUE;
-		double longitude;
-		for (String restName : restaurants.keySet()) {
-			longitude = restaurants.get(restName).getLongitude();
-			if (minLongitude > longitude)
-				minLongitude = longitude;
-		}
-		return minLongitude;
-	}
-
-	private double maxLatitude() {
-		double maxLatitude = Double.MIN_VALUE;
-		double latitude;
-		for (String restName : restaurants.keySet()) {
-			latitude = restaurants.get(restName).getLatitude();
-			if (maxLatitude < latitude)
-				maxLatitude = latitude;
-		}
-		return maxLatitude;
-	}
-
-	private double minLatitude() {
-		double minLatitude = Double.MAX_VALUE;
-		double latitude;
-		for (String restName : restaurants.keySet()) {
-			latitude = restaurants.get(restName).getLatitude();
-			if (minLatitude > latitude)
-				minLatitude = latitude;
-		}
-		return minLatitude;
-	}
-
 	@Override
 	public ToDoubleBiFunction<MP5Db<Restaurant>, String> getPredictorFunction(String user) {
 		// TODO Auto-generated method stub
@@ -385,11 +408,13 @@ public class YelpDB implements MP5Db<Restaurant> {
 		double avgPrice = avgList.get(0);
 		double avgRating = avgList.get(1);
 
+
 		ToDoubleBiFunction<MP5Db<Restaurant>, String> predictor = generatePredictor(prices, ratings, avgPrice,
 				avgRating);
 
 		return predictor;
 	}
+
 
 	/**
 	 * Finds the different reviews that the user has created, and finds the ratings
@@ -438,6 +463,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 		}
 
 		int num = prices.size();
+
 		if (num > 0) {
 			avgPrice = (double) sumPrice / num;
 			avgRating = (double) sumRating / num;
@@ -450,6 +476,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 
 		return avgList;
 	}
+
 
 	/**
 	 * Generates a function that predicts the user's ratings for Restaurants in the

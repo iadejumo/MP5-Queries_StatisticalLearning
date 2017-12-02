@@ -11,7 +11,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import antlr.TokenStream;
 
 
 public class TestJSON {
@@ -32,6 +31,7 @@ public class TestJSON {
 		
 		//yelpDB.parseInput(s);
 		System.out.println(predicted);
+		
 		
     }
 	
