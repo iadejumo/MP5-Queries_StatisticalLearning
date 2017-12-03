@@ -110,7 +110,7 @@ public class Review {
 	}
 
 	/**
-	 * returns the review's text content 
+	 * returns the review's text content
 	 * 
 	 * @return String - returns review's text content
 	 */
@@ -148,8 +148,10 @@ public class Review {
 	/**
 	 * checks the equality of this Review to other
 	 * 
-	 * @param other - Object to be compared to this in terms of equality
-	 * @return boolean - true if other and this are equal (have the same review_id), else false 
+	 * @param other
+	 *            - Object to be compared to this in terms of equality
+	 * @return boolean - true if other and this are equal (have the same review_id),
+	 *         else false
 	 */
 	@Override
 	public boolean equals(Object other) {

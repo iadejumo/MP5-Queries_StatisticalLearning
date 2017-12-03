@@ -73,45 +73,46 @@ public class User {
 	}
 
 	/**
-	 * Creates a User object with the given name, and initiates empty fields 
+	 * Creates a User object with the given name, and initiates empty fields
 	 * 
-	 * @param name - String name of the user, can't be null
+	 * @param name
+	 *            - String name of the user, can't be null
 	 */
 	public User(String name) {
 		this.name = name;
 		this.user_id = generateUser_id();
 		this.url = generateDummyURL(user_id);
 		this.votes = generateNewVotesMap();
-		this.review_count = 0; 
+		this.review_count = 0;
 		this.type = "user";
 		this.average_stars = 0.0;
 		this.jsonString = generateJsonString();
 	}
-	
+
 	// creates random user_id for new user
 	private String generateUser_id() {
 		String uniqueID = UUID.randomUUID().toString();
 		uniqueID += name.hashCode();
-		
+
 		return uniqueID;
 	}
-	
+
 	// creates the url for new user
 	private String generateDummyURL(String user_id) {
 		String defaultURL = "http://www.yelp.com/user_details?userid=";
 		return defaultURL + user_id;
 	}
-	
+
 	// creates an empty votes map
-	private Map<String, Integer> generateNewVotesMap(){
+	private Map<String, Integer> generateNewVotesMap() {
 		Map<String, Integer> map = new HashMap<String, Integer>();
 		map.put("funny", 0);
 		map.put("useful", 0);
 		map.put("cool", 0);
-		
+
 		return map;
 	}
-	
+
 	// create JsonString of user
 	private String generateJsonString() {
 		JSONObject JsonObj = new JSONObject();
@@ -125,7 +126,6 @@ public class User {
 
 		return JsonObj.toString();
 	}
-	
 
 	/**
 	 * gets the URL of the website associated with the user
@@ -190,17 +190,19 @@ public class User {
 	public Double getAverage_stars() {
 		return average_stars;
 	}
-	
+
 	public void updateRating(long newReview) {
-		average_stars = (average_stars*review_count + newReview)/(review_count + 1); 
+		average_stars = (average_stars * review_count + newReview) / (review_count + 1);
 		review_count++;
 	}
 
 	/**
 	 * checks the equality of this User to other
 	 * 
-	 * @param other - Object to be compared to this in terms of equality
-	 * @return boolean - true if other and this are equal  (have the same user_id), else false
+	 * @param other
+	 *            - Object to be compared to this in terms of equality
+	 * @return boolean - true if other and this are equal (have the same user_id),
+	 *         else false
 	 */
 	@Override
 	public boolean equals(Object other) {

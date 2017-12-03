@@ -11,21 +11,22 @@ public class Restaurant {
 	 * Abstraction Function: all fields of this restaurant, which represent a
 	 * restaurant's characteristics
 	 * 
-	 * Rep. Invariants: 
+	 * Rep. Invariants:
 	 * 
-	 * no fields are null 
+	 * no fields are null
 	 * 
-	 * 1<=stars<=5 
+	 * 1<=stars<=5
 	 * 
-	 * 1<=price<=4 
+	 * 1<=price<=4
 	 * 
 	 * photo_url and url are URLs that link to websites for the restaurant
 	 * 
-	 * longitude and latitude are within UCB's range 
+	 * longitude and latitude are within UCB's range
 	 * 
-	 * review_count>=0 
+	 * review_count>=0
 	 * 
-	 * neighborhoods, state, city, full_address, schools match restaurant's real location 
+	 * neighborhoods, state, city, full_address, schools match restaurant's real
+	 * location
 	 * 
 	 * type.equals("restaurant")
 	 */
@@ -265,15 +266,17 @@ public class Restaurant {
 	}
 
 	public void updateRating(long newReview) {
-		stars = (stars*review_count + newReview)/(review_count + 1); 
+		stars = (stars * review_count + newReview) / (review_count + 1);
 		review_count++;
 	}
-	
+
 	/**
 	 * checks the equality of this Restaurant to other
 	 * 
-	 * @param other - Object to be compared to this in terms of equality
-	 * @return boolean - true if other and this are equal (have the same business_id), else false 
+	 * @param other
+	 *            - Object to be compared to this in terms of equality
+	 * @return boolean - true if other and this are equal (have the same
+	 *         business_id), else false
 	 */
 	@Override
 	public boolean equals(Object other) {
@@ -284,7 +287,7 @@ public class Restaurant {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * returns the Hashcode of the Restaurant
 	 * 
@@ -294,11 +297,11 @@ public class Restaurant {
 	public int hashCode() {
 		return business_id.hashCode();
 	}
-	
+
 	/**
 	 * returns the String representation of the Restaurant
 	 * 
-	 * @return String - the String representation of the Restaurant 
+	 * @return String - the String representation of the Restaurant
 	 */
 	@Override
 	public String toString() {
