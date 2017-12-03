@@ -269,6 +269,12 @@ public class Restaurant {
 		review_count++;
 	}
 	
+	/**
+	 * checks the equality of this Restaurant to other
+	 * 
+	 * @param other - Object to be compared to this in terms of equality
+	 * @return boolean - true if other and this are equal (have the same business_id), else false 
+	 */
 	@Override
 	public boolean equals(Object other) {
 		if (other instanceof Restaurant) {
@@ -279,11 +285,21 @@ public class Restaurant {
 		}
 	}
 	
+	/**
+	 * returns the Hashcode of the Restaurant
+	 * 
+	 * @return int - the hashcode of the Restaurant
+	 */
 	@Override
 	public int hashCode() {
 		return business_id.hashCode();
 	}
 	
+	/**
+	 * returns the String representation of the Restaurant
+	 * 
+	 * @return String - the String representation of the Restaurant 
+	 */
 	@Override
 	public String toString() {
 		return jsonString;
