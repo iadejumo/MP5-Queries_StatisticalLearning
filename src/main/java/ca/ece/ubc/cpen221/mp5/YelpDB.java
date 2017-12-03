@@ -14,12 +14,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.ToDoubleBiFunction;
 
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonBuilderFactory;
+
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -29,18 +34,28 @@ public class YelpDB implements MP5Db<Restaurant> {
 	/*
 	 * Abstraction function: restaurants x reviews x users
 	 * 
-	 * Representation Invariants: 
-	 * all Restaurants in restaurants have different business_id's
-	 * all Users in users have different user_id's 
-	 * all Reviews in reviews have different review_id's
-	 * all keys in userToReview are user_id's that map to a list of all review_id's that have the same user_id
-	 * all keys in userToRestaurant are user_id's that map to a list of all business_id's of restaurants that these users have reviewed
-	 * all keys in restaurantToReview are business_id's that map to a list of all review_id's that have the business_id's
-	 * all of the Strings in userToReview/restaurantToReview/userToRestaurant are business_ids/review_ids/user_ids
-	 * which leads to
-	 * restaurantToReview.size() == restaurants.size()
-	 * userToReview.size() == users.size() == userToRestaurant.size()
+	 * Representation Invariants: all Restaurants in restaurants have different
+	 * business_id's
 	 * 
+	 * all Users in users have different user_id's
+	 * 
+	 * all Reviews in reviews have different review_id's
+	 * 
+	 * all keys in userToReview are user_id's that map to a list of all review_id's
+	 * that have the same user_id
+	 * 
+	 * all keys in userToRestaurant are user_id's that map to a list of all
+	 * business_id's of restaurants that these users have reviewed
+	 * 
+	 * all keys in restaurantToReview are business_id's that map to a list of all
+	 * review_id's that have the business_id's
+	 * 
+	 * all of the Strings in userToReview/restaurantToReview/userToRestaurant are
+	 * business_ids/review_ids/user_ids which leads to
+	 * 
+	 * restaurantToReview.size() == restaurants.size()
+	 * 
+	 * userToReview.size() == users.size() == userToRestaurant.size()
 	 * 
 	 * Note: review.size()/review_count/votes/average_stars/stars do not have to sum
 	 * up in any way, as reviews and votes could be done to non-restaurant
@@ -235,7 +250,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 	public Map<String, Restaurant> getRestaurants() {
 		return new HashMap<String, Restaurant>(restaurants);
 	}
-	
+
 	/**
 	 * Returns the map containing an unmodifiable map and review_ids mapped to
 	 * Review objects
@@ -246,13 +261,13 @@ public class YelpDB implements MP5Db<Restaurant> {
 	public Map<String, Review> getReviews() {
 		return new HashMap<String, Review>(reviews);
 	}
-	
+
 	/**
-	 * Returns the map containing an unmodifiable map and user_ids mapped to
-	 * User objects
+	 * Returns the map containing an unmodifiable map and user_ids mapped to User
+	 * objects
 	 * 
-	 * @return the map containing an unmodifiable map and user_ids mapped to
-	 *         User objects
+	 * @return the map containing an unmodifiable map and user_ids mapped to User
+	 *         objects
 	 */
 	public Map<String, User> getUsers() {
 		return new HashMap<String, User>(users);
@@ -301,26 +316,26 @@ public class YelpDB implements MP5Db<Restaurant> {
 		String jsonFormat = convertListToJsonFormat(clusterList);
 		return jsonFormat;
 	}
-
+	
 	// converts List<Set<Restaurant>> to a String in Json Format
 	private String convertListToJsonFormat(List<Set<Restaurant>> clusterList) {
-		String jsonFormat = "";
-
-		// for each Restaurant in each cluster, create a JSONObject with the necessary
-		// fields, then convert the JSONObject to String format, then add it to String
-		for (int clusterNum = 0; clusterNum < clusterList.size(); clusterNum++) {
-			for (Restaurant r : clusterList.get(clusterNum)) {
-				JSONObject obj = new JSONObject();
-				obj.put("x", r.getLatitude());
-				obj.put("y", r.getLongitude());
-				obj.put("name", r.getName());
-				obj.put("cluster", clusterNum);
-				obj.put("weight", WEIGHT);
-				jsonFormat += obj.toJSONString();
+			
+			JSONArray jArray = new JSONArray();
+			// for each Restaurant in each cluster, create a JSONObject with the necessary
+			// fields, then add it to jArray
+			for (int clusterNum = 0; clusterNum < clusterList.size(); clusterNum++) {
+				for (Restaurant r : clusterList.get(clusterNum)) {
+					JSONObject obj = new JSONObject();
+					obj.put("x", r.getLatitude());
+					obj.put("y", r.getLongitude());
+					obj.put("name", r.getName());
+					obj.put("cluster", clusterNum);
+					obj.put("weight", WEIGHT);
+					jArray.add(obj);
+				}
 			}
+			return jArray.toJSONString();
 		}
-		return jsonFormat;
-	}
 
 	// finds k clusters of restaurants
 	private List<Set<Restaurant>> findClusters(int k) {
@@ -612,16 +627,16 @@ public class YelpDB implements MP5Db<Restaurant> {
 
 		return predictor;
 	}
-	
+
 	private void updateRatingsAndRatingsCount(String business_id, String user_id, long newRating) {
-		restaurants.get(business_id).updateRating(newRating);		
+		restaurants.get(business_id).updateRating(newRating);
 		users.get(user_id).updateRating(newRating);
 	}
 
 	public String addUser(String name) {
 		User u = new User(name);
 		users.put(u.getUser_id(), u);
-		
+
 		return u.toString();
 	}
 }

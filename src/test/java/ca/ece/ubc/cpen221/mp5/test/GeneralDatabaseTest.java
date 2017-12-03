@@ -54,7 +54,7 @@ public class GeneralDatabaseTest {
 			r = reviews.get(s);
 			break;
 		}
-
+		System.out.println(r.getDate());
 		assertTrue(r.getBusiness_id().equals("1CBs84C-a-cuA3vncXVSAw"));
 		assertTrue(r.getDate().equals("2009-02-24"));
 		assertTrue(r.getReview_id().equals("bWgTFMpd-uZ9z-4pp3mjxw"));
@@ -77,6 +77,8 @@ public class GeneralDatabaseTest {
 			break;
 		}
 
+		System.out.println(r.getVotes());
+		
 		assertTrue(r.getName().equals("Karen D."));
 		assertTrue(r.getReview_count() == 14);
 		assertTrue(r.getType().equals("user"));

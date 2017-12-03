@@ -22,7 +22,7 @@ public interface MP5Db<T> {
 	 * Cluster objects into k clusters using k-means clustering
 	 * 
 	 * @param k
-	 *            number of clusters to create (0 < k <= number of objects)
+	 *            number of clusters to create (0 < k <= (number of objects)/3 (weakened specs) )
 	 * @return a String, in JSON format, that represents the clusters
 	 */
 	String kMeansClusters_json(int k);
