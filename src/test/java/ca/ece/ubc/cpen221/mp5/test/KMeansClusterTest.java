@@ -29,36 +29,30 @@ public class KMeansClusterTest {
 			if (s.substring(k, k + 10).equals("cluster\":0"))
 				count1++;
 		}
-		System.out.println(count1);
-
+		
 		int count2 = 0;
 		for (int k = 0; k < s.length() - 10; k++) {
 			if (s.substring(k, k + 10).equals("cluster\":1"))
 				count2++;
 		}
-		System.out.println(count2);
 
 		int count3 = 0;
 		for (int k = 0; k < s.length() - 10; k++) {
 			if (s.substring(k, k + 10).equals("cluster\":2"))
 				count3++;
 		}
-		System.out.println(count3);
 
 		int count4 = 0;
 		for (int k = 0; k < s.length() - 10; k++) {
 			if (s.substring(k, k + 10).equals("cluster\":3"))
 				count4++;
 		}
-		System.out.println(count4);
 
 		int count5 = 0;
 		for (int k = 0; k < s.length() - 10; k++) {
 			if (s.substring(k, k + 10).equals("cluster\":4"))
 				count5++;
 		}
-
-		System.out.println(count5);
 
 		assertTrue(count1 + count2 + count3 + count4 + count5 == 135);
 	}
@@ -78,38 +72,8 @@ public class KMeansClusterTest {
 			if (s.substring(k, k + 10).equals("cluster\":0"))
 				count1++;
 		}
-		System.out.println(count1);
 
-		int count2 = 0;
-		for (int k = 0; k < s.length() - 10; k++) {
-			if (s.substring(k, k + 10).equals("cluster\":1"))
-				count2++;
-		}
-		System.out.println(count2);
-
-		int count3 = 0;
-		for (int k = 0; k < s.length() - 10; k++) {
-			if (s.substring(k, k + 10).equals("cluster\":2"))
-				count3++;
-		}
-		System.out.println(count3);
-
-		int count4 = 0;
-		for (int k = 0; k < s.length() - 10; k++) {
-			if (s.substring(k, k + 10).equals("cluster\":3"))
-				count4++;
-		}
-		System.out.println(count4);
-
-		int count5 = 0;
-		for (int k = 0; k < s.length() - 10; k++) {
-			if (s.substring(k, k + 10).equals("cluster\":4"))
-				count5++;
-		}
-
-		System.out.println(count5);
-
-		assertTrue(count1 + count2 + count3 + count4 + count5 == 135);
+		assertTrue(count1 == 135);
 	}
 
 	@Test
