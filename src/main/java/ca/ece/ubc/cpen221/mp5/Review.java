@@ -145,6 +145,8 @@ public class Review {
 		return date;
 	}
 
+	
+	//note: may remove this equals method if we choose to make its equality only on object equality
 	/**
 	 * checks the equality of this Review to other
 	 * 
