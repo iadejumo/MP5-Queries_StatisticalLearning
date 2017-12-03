@@ -85,5 +85,76 @@ public class GeneralDatabaseTest {
 		assertTrue(r.getAverage_stars() < 4.5);
 		assertTrue(r.getVotes().size() == 3);
 	}
+	
+	@Test
+	public void test4() throws ParseException, IOException {
+		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
+		Map<String, User> usersInitial = yelpDB.getUsers();
+		User newUser = null;
+		String userName = "Sathish G.";
+		
+		boolean found1 = false;
+	
+		for (String s : usersInitial.keySet()) {
+			if(usersInitial.get(s).getName().equals(userName)) {
+				found1 = true;
+			}
+		}
+		
+		assertFalse(found1);
+		
+		yelpDB.addUser(userName);
+		
+		Map<String, User> usersAfter = yelpDB.getUsers();
+		boolean found2 = false;
+		
+		for (User u : usersAfter.values()) {
+			if(u.getName().equals(userName)) {
+				found2 = true;
+				newUser = u;
+			}
+		}
+		
+		assertTrue(found2);
+		System.out.println(newUser.getUser_id());
+	}
+	
+	@Test
+	public void test5() throws ParseException, IOException {
+		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
+		
+		Restaurant res1 = yelpDB.getRestaurants().get("QQIjsdcokFermi2ugoD6ow");
+		Restaurant res2 = yelpDB.getRestaurants().get("plRUSuB_uY_dEgcMqeZMYA");
+		Restaurant res3 = res1;
+		
+		Review rev1 = yelpDB.getReviews().get("9-OuiSVIYEgiDLpDIYlkjw");
+		Review rev2 = yelpDB.getReviews().get("9rST92s00AoVF2rws1haYg");
+		Review rev3 = rev1;
+		
+		User user1 = yelpDB.getUsers().get("cywLfetwd4k7gSu5ewNuhw");
+		User user2 = yelpDB.getUsers().get("dLob_b2vhg4_V95-VMVdLw");
+		User user3 = user1;
+		
+		assertFalse(res1.equals(res2));
+		assertTrue(res1.hashCode() != res2.hashCode());
+		assertTrue(res1.equals(res3));
+		assertTrue(res1.hashCode() == res3.hashCode());
+		
+		assertFalse(rev1.equals(rev2));
+		assertTrue(rev1.hashCode() != rev2.hashCode());
+		assertTrue(rev1.equals(rev3));
+		assertTrue(rev1.hashCode() == rev3.hashCode());
+		
+		assertFalse(user1.equals(user2));
+		assertTrue(user1.hashCode() != user2.hashCode());
+		assertTrue(user1.equals(user3));
+		assertTrue(user1.hashCode() == user3.hashCode());
+		
+		assertFalse(res1.equals(rev1));
+		assertFalse(rev1.equals(user1));
+		assertFalse(user1.equals(res1));
+		
+		
+	}
 
 }
