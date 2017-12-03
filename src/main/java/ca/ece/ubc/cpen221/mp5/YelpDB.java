@@ -316,26 +316,26 @@ public class YelpDB implements MP5Db<Restaurant> {
 		String jsonFormat = convertListToJsonFormat(clusterList);
 		return jsonFormat;
 	}
-	
+
 	// converts List<Set<Restaurant>> to a String in Json Format
 	private String convertListToJsonFormat(List<Set<Restaurant>> clusterList) {
-			
-			JSONArray jArray = new JSONArray();
-			// for each Restaurant in each cluster, create a JSONObject with the necessary
-			// fields, then add it to jArray
-			for (int clusterNum = 0; clusterNum < clusterList.size(); clusterNum++) {
-				for (Restaurant r : clusterList.get(clusterNum)) {
-					JSONObject obj = new JSONObject();
-					obj.put("x", r.getLatitude());
-					obj.put("y", r.getLongitude());
-					obj.put("name", r.getName());
-					obj.put("cluster", clusterNum);
-					obj.put("weight", WEIGHT);
-					jArray.add(obj);
-				}
+
+		JSONArray jArray = new JSONArray();
+		// for each Restaurant in each cluster, create a JSONObject with the necessary
+		// fields, then add it to jArray
+		for (int clusterNum = 0; clusterNum < clusterList.size(); clusterNum++) {
+			for (Restaurant r : clusterList.get(clusterNum)) {
+				JSONObject obj = new JSONObject();
+				obj.put("x", r.getLatitude());
+				obj.put("y", r.getLongitude());
+				obj.put("name", r.getName());
+				obj.put("cluster", clusterNum);
+				obj.put("weight", WEIGHT);
+				jArray.add(obj);
 			}
-			return jArray.toJSONString();
 		}
+		return jArray.toJSONString();
+	}
 
 	// finds k clusters of restaurants
 	private List<Set<Restaurant>> findClusters(int k) {
@@ -619,16 +619,24 @@ public class YelpDB implements MP5Db<Restaurant> {
 
 		ToDoubleBiFunction<MP5Db<Restaurant>, String> predictor = new ToDoubleBiFunctionModified(a, b);
 
-		// TODO : Delete block of code below;
-		System.out.println(a + "\n" + xList + "\n" + yList);
-		// ToDoubleBiFunction<MP5Db<Restaurant>, String> predictor = (yelpDB,
-		// restaurant) -> ((((YelpDB) yelpDB).restaurants.get(restaurant).getPrice()) *
-		// b + a);
-
 		return predictor;
 	}
 
-	private void updateRatingsAndRatingsCount(String business_id, String user_id, long newRating) {
+	/**
+	 * Updates the rating count and average rating for both the restaurant being
+	 * reviewed and the user making the review
+	 * 
+	 * @param business_id
+	 *            represents a business_id(restaurant_id) in the database
+	 * @param user_id
+	 *            represents a user_id in the database
+	 * @param newRating
+	 *            the new rating being submitted 1 <= newRating <= 5
+	 */
+	// This is supposed to be a private method that would be called by the addReview
+	// method, however, because for testing purposes, and since addReviews would not
+	// be completed in time for the first deadline it was changed to public.
+	public void updateRatingsAndRatingsCount(String business_id, String user_id, long newRating) {
 		restaurants.get(business_id).updateRating(newRating);
 		users.get(user_id).updateRating(newRating);
 	}
