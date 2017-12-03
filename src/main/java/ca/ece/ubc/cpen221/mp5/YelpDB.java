@@ -612,6 +612,13 @@ public class YelpDB implements MP5Db<Restaurant> {
 		users.get(user_id).updateRating(newRating);
 	}
 
+	/**
+	 * Creates/ initializes a new user and adds them to the database
+	 * 
+	 * @param name
+	 *            name of the new user/member is not null
+	 * @return Json string representation of the new user's profile in the database
+	 */
 	public String addUser(String name) {
 		User u = new User(name);
 		users.put(u.getUser_id(), u);
