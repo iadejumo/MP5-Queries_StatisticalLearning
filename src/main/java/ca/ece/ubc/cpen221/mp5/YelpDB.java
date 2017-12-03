@@ -7,23 +7,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import java.util.HashSet;
-import java.util.Iterator;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.ToDoubleBiFunction;
 
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonBuilderFactory;
-
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -280,24 +269,6 @@ public class YelpDB implements MP5Db<Restaurant> {
 		return null;
 	}
 
-	// Uncompleted (Part 5)
-	private void parseInput(String input) {
-		CharStream stream = new ANTLRInputStream(input);
-
-		QueryGrammarLexer lexer = new QueryGrammarLexer(stream);
-		TokenStream tokens = new CommonTokenStream(lexer);
-
-		QueryGrammarParser parser = new QueryGrammarParser(tokens);
-
-		ParseTree tree = parser.orExpr();
-
-		System.err.println(tree.toStringTree(parser));
-		// ((RuleContext) tree).inspect((Parser)parser);
-		ParseTreeWalker walker = new ParseTreeWalker();
-		QueryGrammarListener listener = new ExpressionEvalution();
-		walker.walk(listener, tree);
-	}
-
 	/**
 	 * Groups the restaurants into k clusters, such that no point is closer to the
 	 * centroid of its assigned cluster than any other cluster. This finds k
@@ -316,26 +287,26 @@ public class YelpDB implements MP5Db<Restaurant> {
 		String jsonFormat = convertListToJsonFormat(clusterList);
 		return jsonFormat;
 	}
-	
+
 	// converts List<Set<Restaurant>> to a String in Json Format
 	private String convertListToJsonFormat(List<Set<Restaurant>> clusterList) {
-			
-			JSONArray jArray = new JSONArray();
-			// for each Restaurant in each cluster, create a JSONObject with the necessary
-			// fields, then add it to jArray
-			for (int clusterNum = 0; clusterNum < clusterList.size(); clusterNum++) {
-				for (Restaurant r : clusterList.get(clusterNum)) {
-					JSONObject obj = new JSONObject();
-					obj.put("x", r.getLatitude());
-					obj.put("y", r.getLongitude());
-					obj.put("name", r.getName());
-					obj.put("cluster", clusterNum);
-					obj.put("weight", WEIGHT);
-					jArray.add(obj);
-				}
+
+		JSONArray jArray = new JSONArray();
+		// for each Restaurant in each cluster, create a JSONObject with the necessary
+		// fields, then add it to jArray
+		for (int clusterNum = 0; clusterNum < clusterList.size(); clusterNum++) {
+			for (Restaurant r : clusterList.get(clusterNum)) {
+				JSONObject obj = new JSONObject();
+				obj.put("x", r.getLatitude());
+				obj.put("y", r.getLongitude());
+				obj.put("name", r.getName());
+				obj.put("cluster", clusterNum);
+				obj.put("weight", WEIGHT);
+				jArray.add(obj);
 			}
-			return jArray.toJSONString();
 		}
+		return jArray.toJSONString();
+	}
 
 	// finds k clusters of restaurants
 	private List<Set<Restaurant>> findClusters(int k) {
@@ -619,20 +590,35 @@ public class YelpDB implements MP5Db<Restaurant> {
 
 		ToDoubleBiFunction<MP5Db<Restaurant>, String> predictor = new ToDoubleBiFunctionModified(a, b);
 
-		// TODO : Delete block of code below;
-		System.out.println(a + "\n" + xList + "\n" + yList);
-		// ToDoubleBiFunction<MP5Db<Restaurant>, String> predictor = (yelpDB,
-		// restaurant) -> ((((YelpDB) yelpDB).restaurants.get(restaurant).getPrice()) *
-		// b + a);
-
 		return predictor;
 	}
 
-	private void updateRatingsAndRatingsCount(String business_id, String user_id, long newRating) {
+	/**
+	 * Updates the rating count and average rating for both the restaurant being
+	 * reviewed and the user making the review
+	 * 
+	 * @param business_id
+	 *            represents a business_id(restaurant_id) in the database
+	 * @param user_id
+	 *            represents a user_id in the database
+	 * @param newRating
+	 *            the new rating being submitted 1 <= newRating <= 5
+	 */
+	// This is supposed to be a private method that would be called by the addReview
+	// method, however, because for testing purposes, and since addReviews would not
+	// be completed in time for the first deadline it was changed to public.
+	public void updateRatingsAndRatingsCount(String business_id, String user_id, long newRating) {
 		restaurants.get(business_id).updateRating(newRating);
 		users.get(user_id).updateRating(newRating);
 	}
 
+	/**
+	 * Creates/ initializes a new user and adds them to the database
+	 * 
+	 * @param name
+	 *            name of the new user/member is not null
+	 * @return Json string representation of the new user's profile in the database
+	 */
 	public String addUser(String name) {
 		User u = new User(name);
 		users.put(u.getUser_id(), u);

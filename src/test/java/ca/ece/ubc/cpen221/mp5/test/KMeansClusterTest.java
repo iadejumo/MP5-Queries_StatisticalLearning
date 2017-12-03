@@ -22,7 +22,6 @@ public class KMeansClusterTest {
 		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
 
 		String s = yelpDB.kMeansClusters_json(5);
-		System.out.println(s);
 
 		int count1 = 0;
 		for (int k = 0; k < s.length() - 10; k++) {
@@ -62,17 +61,13 @@ public class KMeansClusterTest {
 
 		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
 
-		System.out.println("Done");
-
 		String s = yelpDB.kMeansClusters_json(1);
-		System.out.println(s);
 
 		int count1 = 0;
 		for (int k = 0; k < s.length() - 10; k++) {
 			if (s.substring(k, k + 10).equals("cluster\":0"))
 				count1++;
 		}
-
 		assertTrue(count1 == 135);
 	}
 
@@ -81,10 +76,7 @@ public class KMeansClusterTest {
 
 		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
 
-		System.out.println("Done");
-
 		String s = yelpDB.kMeansClusters_json(11);
-		System.out.println(s);
 
 		int count0 = 0;
 		for (int k = 0; k < s.length() - 10; k++) {
@@ -173,10 +165,8 @@ public class KMeansClusterTest {
 	public void test5() throws ParseException, IOException {
 
 		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
-		System.out.println("Done");
 
 		String s = yelpDB.kMeansClusters_json(60);
-		System.out.println(s);
 		
 	}
 	

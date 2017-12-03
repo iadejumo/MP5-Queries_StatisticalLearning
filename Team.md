@@ -2,8 +2,6 @@
 
 repo-name: f17-mp5-tylerlum_iadejumo
 
-Student Name - Student Number:  
-
 Tyler Lum - 30538169  
 
 Isaiah Adejumo - 23345168; 
