@@ -27,7 +27,6 @@ public class GeneralDatabaseTest {
 		Map<String, Restaurant> restaurants = yelpDB.getRestaurants();
 
 		Restaurant r = restaurants.get("gclB3ED6uk6viWlolSb_uA");
-
 		assertTrue(r.getCity().equals("Berkeley"));
 		assertTrue(r.getBusiness_id().equals("gclB3ED6uk6viWlolSb_uA"));
 		assertTrue(r.getFull_address().length() == (48));

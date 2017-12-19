@@ -7,10 +7,17 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import javax.json.JsonObject;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
-
-import fibonacci.FibonacciServerMulti;
 
 public class YelpDBServer {
 
@@ -26,13 +33,17 @@ public class YelpDBServer {
 	// data in handle
 	// filenames are private and final and String, so its reference and object
 	// values are fully immutable
+	// commands is only ever read from NEVER WRITTEN TO after constructor and is immutable
 	private final YelpDB yelpDB;
+	
 	private ServerSocket serverSocket;
 	public static final int YELPDB_PORT = 4949;
 
 	private final String userFile = "data/users.json";
 	private final String restaurantFile = "data/restaurants.json";
 	private final String reviewFile = "data/reviews.json";
+	
+	private final List<String> commands; //maybe should be static?
 
 	/**
 	 * Make a YelpDBServer that listens for connections on port.
@@ -47,6 +58,16 @@ public class YelpDBServer {
 	public YelpDBServer(int port) throws ParseException, IOException {
 		yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
 		serverSocket = new ServerSocket(port);
+		commands = setupCommands();
+	}
+	
+	private List<String> setupCommands(){
+		List<String> commands = new ArrayList<String>();
+		commands.add("GETRESTAURANT");
+		commands.add("ADDUSER");
+		commands.add("ADDRESTAURANT");
+		commands.add("ADDREVIEW");
+		return Collections.unmodifiableList(commands);
 	}
 
 	/**
@@ -104,21 +125,25 @@ public class YelpDBServer {
 		PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()),true);
 		
 		try {
-			//each request is a single line containing a number
+			//each request is a single line containing a command keyword and its parameters
 			for (String line = in.readLine(); line != null; line = in.readLine()) {
 				System.err.println("request: " + line);
 				try {
-					// TODO make this handle actually do YelpDB work
-					int x = Integer.valueOf(line);
-					// compute ansewr and send back to client
-					int y = x;
-					System.err.println("reply: " + y);
-					out.println(y);
-				} catch (Exception e) {
+				
+					// get answer and send back to client
+					String reply = prepareReply(line);
+					System.err.println("reply: " + reply);
+					out.println(reply);
+				} /*catch (NoRestaurantException e) {
+					// complain about the error in format of request
+					System.err.println("reply: ERR: NO_RESTAURANT_WITH_GIVEN_ID");
+					out.println("ERR: NO_RESTAURANT_WITH_GIVEN_ID\n");	
+				} */
+				catch (Exception e) {
 					// complain about error in format of request
 					System.err.println("reply: err");
 					out.println("err\n");	
-				}
+				} 
 				// important! our PrintWriter is auto-flushing, but if not
 				// out.flush();
 			}
@@ -128,6 +153,36 @@ public class YelpDBServer {
 		}
 	}
 	
+	private String prepareReply(String inputLine) {
+		return null;
+	}
+	
+	private synchronized Restaurant getRestaurant(String businessId) {
+		Map<String, Restaurant> allRestaurants = yelpDB.getRestaurants();
+		return allRestaurants.get(businessId);
+	}
+	
+	private synchronized void addReview(Review review) {
+		
+	}
+	
+	private synchronized void addRestaurant(Restaurant restaurant) {
+		
+	}
+	
+	private synchronized void addUser(String userName) {
+		yelpDB.addUser(userName);
+	}
+	
+	private String convertToJsonFormat(Restaurant r) {
+
+		JSONObject obj = new JSONObject();
+		obj.put("x", r.getLatitude());
+		obj.put("y", r.getLongitude());
+		obj.put("name", r.getName());
+	
+		return obj.toJSONString();
+	}
 	/**
 	 * Start a YelpDBServer running on the default port.
 	 */
