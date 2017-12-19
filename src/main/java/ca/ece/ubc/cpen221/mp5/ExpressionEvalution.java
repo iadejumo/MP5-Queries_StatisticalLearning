@@ -1,6 +1,8 @@
 package ca.ece.ubc.cpen221.mp5;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -8,6 +10,17 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 public class ExpressionEvalution extends QueryGrammarBaseListener {
+	private Map<String, Restaurant> restaurants;
+	private Map<String, Review> reviews;
+	private Map<String, User> users;
+	
+	private static final double PRECISION = 0.0001;
+	
+	public ExpressionEvalution(YelpDB yelpDB) {
+		restaurants = yelpDB.getRestaurants();
+		reviews = yelpDB.getReviews();
+		users = yelpDB.getUsers();
+	}
 	/**
 	 * {@inheritDoc}
 	 *
@@ -51,23 +64,11 @@ public class ExpressionEvalution extends QueryGrammarBaseListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void enterIn(QueryGrammarParser.InContext ctx) {
-		/*List<TerminalNode> l = ctx.string().WORD();
-		String initS = "";
-		String ws = " ";
-		for (TerminalNode n: l) {
-			initS += n + ws;
-		}
-		initS = initS.substring(0,initS.length()-1);
+		String neighborhood = ctx.string().getText();
 		
-		final String finalS = new String(initS);
-		*/
-		
-		String finalS = ctx.string().getText();
-		System.out.println(finalS);
-		
-		//List <String> list = YelpDB.restaurants.keySet().stream().filter(x -> YelpDB.restaurants.get(x).getNeighborhoods().contains(finalS)).collect(Collectors.toList());
+		List <String> matchNeighborhood = restaurants.keySet().stream().filter(x -> restaurants.get(x).getNeighborhoods().contains(neighborhood)).collect(Collectors.toList());
 		//System.out.println(ctx.string().WORD());
-		//System.out.println(list);
+		System.out.println(matchNeighborhood);
 	}
 	/**
 	 * {@inheritDoc}
@@ -81,22 +82,21 @@ public class ExpressionEvalution extends QueryGrammarBaseListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void enterCategory(QueryGrammarParser.CategoryContext ctx) {
-	/*	List<TerminalNode> l = ctx.string().WORD();
-		String initS = "";
-		String ws = " ";
-		for (TerminalNode n: l) {
-			initS += n + ws;
-		}
-		initS = initS.substring(0,initS.length()-1);
+		String category = ctx.string().getText();
+		String parent = ctx.getParent().getText();
 		
-		final String finalS = new String(initS);
-		
-		System.out.println(finalS);
-		
-		List <String> list = YelpDB.restaurants.keySet().stream().filter(x -> YelpDB.restaurants.get(x).getCategories().contains(finalS)).collect(Collectors.toList());
-		System.out.println(ctx.string().WORD());
-		System.out.println(list);*/
+		List <String> matchCategory = restaurants.keySet().stream().filter(x -> restaurants.get(x).getCategories().contains(category)).collect(Collectors.toList());
+		System.out.println(matchCategory);
 	}
+	
+	public List<String> andExpression(ParserRuleContext ctx) {
+		int number = ctx.getChildCount();
+		
+		List <String> matchCategory = restaurants.keySet().stream().filter(x -> restaurants.get(x).getCategories().contains(category)).collect(Collectors.toList());
+		System.out.println(matchCategory);
+		return matchCategory;
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 *
@@ -108,24 +108,13 @@ public class ExpressionEvalution extends QueryGrammarBaseListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	/*@Override public void enterName(QueryGrammarParser.NameContext ctx) {
-		List<TerminalNode> l = ctx.string().WORD();
-		String initS = "";
-		String ws = " ";
-		for (TerminalNode n: l) {
-			initS += n + ws;
-		}
-		initS = initS.substring(0,initS.length()-1);
+	@Override public void enterName(QueryGrammarParser.NameContext ctx) {
+		String businessName = ctx.string().getText();
 		
-		final String finalS = new String(initS);
-		
-		System.out.println(finalS);
-		
-
-		//List <String> list = YelpDB.restaurants.keySet().stream().filter(x -> YelpDB.restaurants.get(x).getCategories().contains(finalS)).collect(Collectors.toList());
-		//System.out.println(ctx.string().WORD());
-		//System.out.println(list);
-	}*/
+		List <String> matchName = restaurants.keySet().stream().filter(x -> restaurants.get(x).getName().equals(businessName)).collect(Collectors.toList());
+		System.out.println(matchName);
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 *
@@ -136,8 +125,37 @@ public class ExpressionEvalution extends QueryGrammarBaseListener {
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
+	 * @return 
 	 */
-	@Override public void enterRating(QueryGrammarParser.RatingContext ctx) { }
+	@Override public void enterRating(QueryGrammarParser.RatingContext ctx) {
+		double rating = Double.parseDouble(ctx.NUM().getText());
+		String inequality = ctx.INEQ().getText();
+		List <String> matchRatingAndInequality = new ArrayList<String>();
+		
+		if (inequality.equals(">")) {
+			matchRatingAndInequality = restaurants.keySet().stream().filter(x -> restaurants.get(x).getStars() > rating).collect(Collectors.toList());
+		}
+		else if (inequality.equals(">=")) {
+			matchRatingAndInequality = restaurants.keySet().stream().filter(x -> restaurants.get(x).getStars() >= rating).collect(Collectors.toList());
+		} 
+		else if (inequality.equals("<")) {
+			matchRatingAndInequality = restaurants.keySet().stream().filter(x -> restaurants.get(x).getStars() < rating).collect(Collectors.toList());
+		}
+		else if (inequality.equals("<=")) {
+			matchRatingAndInequality = restaurants.keySet().stream().filter(x -> restaurants.get(x).getStars() <= rating).collect(Collectors.toList());
+		}
+		else if (inequality.equals("=")) {
+			matchRatingAndInequality = restaurants.keySet().stream().filter(x -> checkClose(restaurants.get(x).getStars(), rating)).collect(Collectors.toList());
+		}
+			
+		System.out.println(matchRatingAndInequality);
+	}
+	
+	private static boolean checkClose(double arg1, double arg2) {
+		if (Math.abs(arg1 - arg2) < PRECISION)
+			return true;
+		return false;
+	}
 	/**
 	 * {@inheritDoc}
 	 *
@@ -149,7 +167,29 @@ public class ExpressionEvalution extends QueryGrammarBaseListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterPrice(QueryGrammarParser.PriceContext ctx) { }
+	@Override public void enterPrice(QueryGrammarParser.PriceContext ctx) {
+		long price = Long.parseLong(ctx.NUM().getText());
+		String inequality = ctx.INEQ().getText();
+		List <String> matchPriceAndInequality = new ArrayList<String>();
+		
+		if (inequality.equals(">")) {
+			matchPriceAndInequality = restaurants.keySet().stream().filter(x -> restaurants.get(x).getPrice() > price).collect(Collectors.toList());
+		}
+		else if (inequality.equals(">=")) {
+			matchPriceAndInequality = restaurants.keySet().stream().filter(x -> restaurants.get(x).getPrice() >= price).collect(Collectors.toList());
+		} 
+		else if (inequality.equals("<")) {
+			matchPriceAndInequality = restaurants.keySet().stream().filter(x -> restaurants.get(x).getPrice() < price).collect(Collectors.toList());
+		}
+		else if (inequality.equals("<=")) {
+			matchPriceAndInequality = restaurants.keySet().stream().filter(x -> restaurants.get(x).getPrice() <= price).collect(Collectors.toList());
+		}
+		else if (inequality.equals("=")) {
+			matchPriceAndInequality = restaurants.keySet().stream().filter(x -> restaurants.get(x).getPrice() == price).collect(Collectors.toList());
+		}
+		
+		System.out.println(matchPriceAndInequality);
+	}
 	/**
 	 * {@inheritDoc}
 	 *

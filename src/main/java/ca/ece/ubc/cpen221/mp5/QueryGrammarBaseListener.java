@@ -18,6 +18,18 @@ public class QueryGrammarBaseListener implements QueryGrammarListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterRoot(QueryGrammarParser.RootContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitRoot(QueryGrammarParser.RootContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterOrExpr(QueryGrammarParser.OrExprContext ctx) { }
 	/**
 	 * {@inheritDoc}

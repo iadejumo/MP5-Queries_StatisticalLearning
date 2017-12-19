@@ -281,7 +281,8 @@ public class YelpDB implements MP5Db<Restaurant> {
 	}
 
 	// Uncompleted (Part 5)
-	private void parseInput(String input) {
+	// TODO Change back to private
+	public void parseInput(String input) {
 		CharStream stream = new ANTLRInputStream(input);
 
 		QueryGrammarLexer lexer = new QueryGrammarLexer(stream);
@@ -289,13 +290,14 @@ public class YelpDB implements MP5Db<Restaurant> {
 
 		QueryGrammarParser parser = new QueryGrammarParser(tokens);
 
-		ParseTree tree = parser.orExpr();
+		ParseTree tree = parser.root();
 
 		System.err.println(tree.toStringTree(parser));
 		// ((RuleContext) tree).inspect((Parser)parser);
 		ParseTreeWalker walker = new ParseTreeWalker();
-		QueryGrammarListener listener = new ExpressionEvalution();
+		QueryGrammarListener listener = new ExpressionEvalution(this);
 		walker.walk(listener, tree);
+		
 	}
 
 	/**

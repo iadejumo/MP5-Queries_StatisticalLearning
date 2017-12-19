@@ -4,3 +4,5 @@
 /QueryGrammarLexer.tokens
 /QueryGrammarListener.java
 /QueryGrammarParser.java
+/QueryGrammarBaseVisitor.java
+/QueryGrammarVisitor.java
