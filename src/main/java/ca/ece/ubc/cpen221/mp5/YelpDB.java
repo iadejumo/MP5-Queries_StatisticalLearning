@@ -58,10 +58,10 @@ public class YelpDB implements MP5Db<Restaurant> {
 
 	private static final double WEIGHT = 2.0;
 
-	private Map<String, List<String>> userToReview;
-	private Map<String, List<String>> restaurantToReview;
-	private Map<String, List<String>> userToRestaurant;
-
+	private Map<String, Set<String>> userToReview;
+	private Map<String, Set<String>> restaurantToReview;
+	private Map<String, Set<String>> userToRestaurant;
+	
 	/**
 	 * Initializes and constructs the database. And establishes the relationships
 	 * between entries in the database
@@ -196,13 +196,13 @@ public class YelpDB implements MP5Db<Restaurant> {
 	 * 
 	 */
 	private void establishRelationships() {
-		userToReview = new HashMap<String, List<String>>();
-		restaurantToReview = new HashMap<String, List<String>>();
-		userToRestaurant = new HashMap<String, List<String>>();
+		userToReview = new HashMap<String, Set<String>>();
+		restaurantToReview = new HashMap<String, Set<String>>();
+		userToRestaurant = new HashMap<String, Set<String>>();
 
 		// Establishes user to review relationship
 		for (String user : users.keySet()) {
-			userToReview.put(user, new ArrayList<String>());
+			userToReview.put(user, new HashSet<String>());
 		}
 
 		for (Review review : reviews.values()) {
@@ -211,7 +211,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 
 		// Establish restaurants to review relationship
 		for (String restaurant : restaurants.keySet()) {
-			restaurantToReview.put(restaurant, new ArrayList<String>());
+			restaurantToReview.put(restaurant, new HashSet<String>());
 		}
 
 		for (Review review : reviews.values()) {
@@ -220,7 +220,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 
 		// Establish user to restaurant relationship
 		for (String user : users.keySet()) {
-			userToRestaurant.put(user, new ArrayList<String>());
+			userToRestaurant.put(user, new HashSet<String>());
 		}
 
 		for (Review review : reviews.values()) {
@@ -236,7 +236,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 	 * @return the map containing an unmodifiable map and business_ids mapped to
 	 *         Restaurant objects
 	 */
-	public Map<String, Restaurant> getRestaurants() {
+	public synchronized Map<String, Restaurant> getRestaurants() {
 		return new HashMap<String, Restaurant>(restaurants);
 	}
 
@@ -247,7 +247,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 	 * @return the map containing an unmodifiable map and review_ids mapped to
 	 *         Review objects
 	 */
-	public Map<String, Review> getReviews() {
+	public synchronized Map<String, Review> getReviews() {
 		return new HashMap<String, Review>(reviews);
 	}
 
@@ -258,13 +258,13 @@ public class YelpDB implements MP5Db<Restaurant> {
 	 * @return the map containing an unmodifiable map and user_ids mapped to User
 	 *         objects
 	 */
-	public Map<String, User> getUsers() {
+	public synchronized Map<String, User> getUsers() {
 		return new HashMap<String, User>(users);
 	}
 
 	// Uncompleted (Part 5)
 	@Override
-	public Set getMatches(String queryString) {
+	public synchronized Set getMatches(String queryString) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -282,14 +282,14 @@ public class YelpDB implements MP5Db<Restaurant> {
 	 *         is in
 	 */
 	@Override
-	public String kMeansClusters_json(int k) {
+	public synchronized String kMeansClusters_json(int k) {
 		List<Set<Restaurant>> clusterList = findClusters(k);
 		String jsonFormat = convertListToJsonFormat(clusterList);
 		return jsonFormat;
 	}
 
 	// converts List<Set<Restaurant>> to a String in Json Format
-	private String convertListToJsonFormat(List<Set<Restaurant>> clusterList) {
+	private synchronized String convertListToJsonFormat(List<Set<Restaurant>> clusterList) {
 
 		JSONArray jArray = new JSONArray();
 		// for each Restaurant in each cluster, create a JSONObject with the necessary
@@ -309,7 +309,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 	}
 
 	// finds k clusters of restaurants
-	private List<Set<Restaurant>> findClusters(int k) {
+	private synchronized List<Set<Restaurant>> findClusters(int k) {
 
 		// map connecting a centroid point -> a set of restaurants nearest to it
 		Map<Point, Set<Restaurant>> clusterMap;
@@ -336,7 +336,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 	}
 
 	// generates first Centroid points from k restaurants
-	private Map<Point, Point> firstCentroids(int k) {
+	private synchronized Map<Point, Point> firstCentroids(int k) {
 		Map<Point, Point> updatedCentroids = new HashMap<Point, Point>();
 
 		// create k Points at restaurants
@@ -348,7 +348,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 
 	// returns a new Map<Point,Set<Restaurant>> that has the Point keys as the
 	// updatedCentroid points -> new HashSet<Restaurant>
-	private Map<Point, Set<Restaurant>> updateClusterMap(Map<Point, Point> updatedCentroids) {
+	private synchronized Map<Point, Set<Restaurant>> updateClusterMap(Map<Point, Point> updatedCentroids) {
 		Map<Point, Set<Restaurant>> newClusterMap = new HashMap<Point, Set<Restaurant>>();
 
 		for (Point oldCentroid : updatedCentroids.keySet())
@@ -357,7 +357,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 		return newClusterMap;
 	}
 
-	private boolean emptyClusterIn(Map<Point, Set<Restaurant>> clusterMap) {
+	private synchronized boolean emptyClusterIn(Map<Point, Set<Restaurant>> clusterMap) {
 		// only needed for very rare case
 		for (Point centroid : clusterMap.keySet()) {
 			if (clusterMap.get(centroid).isEmpty()) {
@@ -369,7 +369,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 
 	// returns true if at least one centroid point has changed
 	// returns false if no centroid points are changed
-	private boolean newCentroidsFound(Map<Point, Point> newCentroids) {
+	private synchronized boolean newCentroidsFound(Map<Point, Point> newCentroids) {
 		for (Point oldCentroid : newCentroids.keySet()) {
 			if (!oldCentroid.aboutEqual(newCentroids.get(oldCentroid))) {
 				return true;
@@ -379,7 +379,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 	}
 
 	// updates centroid point locations to their new average locations
-	private Map<Point, Point> findNewCentroids(Map<Point, Set<Restaurant>> clusterMap) {
+	private synchronized Map<Point, Point> findNewCentroids(Map<Point, Set<Restaurant>> clusterMap) {
 		// maps the old centroid point -> the new centroid point
 		Map<Point, Point> newCentroids = new HashMap<Point, Point>();
 
@@ -411,16 +411,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 		return newCentroids;
 	}
 
-	/*
-	 * private Point getRestaurantLoc() { Restaurant r; Point p = null; int count =
-	 * 0; int aim = (int) (Math.random() * restaurants.size());
-	 * 
-	 * for (String s : restaurants.keySet()) { if (count == aim) { r =
-	 * restaurants.get(s); p = new Point(r.getLatitude(), r.getLongitude()); break;
-	 * } count++; } return p; }
-	 */
-
-	private Point getRestaurantLoc() {
+	private synchronized Point getRestaurantLoc() {
 		Restaurant r;
 		Point p = null;
 		int count = 0;
@@ -438,7 +429,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 	}
 
 	// modifies clusterMap's Set<Restaurant>
-	private void findClosestRestaurants(Map<Point, Set<Restaurant>> clusterMap) {
+	private synchronized void findClosestRestaurants(Map<Point, Set<Restaurant>> clusterMap) {
 
 		// for each restaurant, find the closest centroid Point to it
 		// and then add this restaurant to the centroid Point's corresponding
@@ -463,7 +454,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 	}
 
 	@Override
-	public ToDoubleBiFunction<MP5Db<Restaurant>, String> getPredictorFunction(String user) {
+	public synchronized ToDoubleBiFunction<MP5Db<Restaurant>, String> getPredictorFunction(String user) {
 		// TODO Auto-generated method stub
 		List<Long> prices = new ArrayList<Long>();
 		List<Long> ratings = new ArrayList<Long>();
@@ -502,7 +493,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 	 *         If the number of restaurants reviewed by the user is 0 then the
 	 *         method returns average price = 0 and average rating = 0
 	 */
-	private List<Double> getUserRatingAndPrice(String user, List<Long> prices, List<Long> ratings) {
+	private synchronized List<Double> getUserRatingAndPrice(String user, List<Long> prices, List<Long> ratings) {
 
 		long sumPrice = 0;
 		long sumRating = 0;
@@ -562,7 +553,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 	 *         If price.size() < 2 then it throw an IllegalArgumentException because
 	 *         the data points are too few.
 	 */
-	private ToDoubleBiFunction<MP5Db<Restaurant>, String> generatePredictor(List<Long> xList, List<Long> yList,
+	private synchronized ToDoubleBiFunction<MP5Db<Restaurant>, String> generatePredictor(List<Long> xList, List<Long> yList,
 			double meanX, double meanY) {
 		int numReviews = xList.size();
 
@@ -607,11 +598,31 @@ public class YelpDB implements MP5Db<Restaurant> {
 	// This is supposed to be a private method that would be called by the addReview
 	// method, however, because for testing purposes, and since addReviews would not
 	// be completed in time for the first deadline it was changed to public.
-	public void updateRatingsAndRatingsCount(String business_id, String user_id, long newRating) {
+	private synchronized void updateRatingsAndRatingsCount(String business_id, String user_id, long newRating) {
 		restaurants.get(business_id).updateRating(newRating);
 		users.get(user_id).updateRating(newRating);
-	}
+	} //must be done to ensure no bad interleavings!
 
+	public synchronized String addRestaurant(String restaurantJsonObj) throws ParseException {
+		JSONParser parser = new JSONParser();
+		JSONObject json = (JSONObject) parser.parse(restaurantJsonObj);
+		Restaurant r = new Restaurant(json);
+		restaurants.put(r.getBusiness_id(), r);
+		restaurantToReview.put(r.getBusiness_id(), new HashSet<String>());
+		return r.toString();
+	}
+	
+	public synchronized String addReview(String reviewJsonObj) throws ParseException {
+		JSONParser parser = new JSONParser();
+		JSONObject json = (JSONObject) parser.parse(reviewJsonObj);
+		Review r = new Review(json);
+		reviews.put(r.toString(), r);
+		userToReview.get(r.getUser_id()).add(r.getReview_id());
+		userToRestaurant.get(r.getUser_id()).add(r.getBusiness_id());
+		restaurantToReview.get(r.getBusiness_id()).add(r.getReview_id());
+		updateRatingsAndRatingsCount(r.getBusiness_id(),r.getUser_id(),r.getStars());
+		return r.toString();
+	}
 	/**
 	 * Creates/ initializes a new user and adds them to the database
 	 * 
@@ -619,10 +630,11 @@ public class YelpDB implements MP5Db<Restaurant> {
 	 *            name of the new user/member is not null
 	 * @return Json string representation of the new user's profile in the database
 	 */
-	public String addUser(String name) {
+	public synchronized String addUser(String name) {
 		User u = new User(name);
 		users.put(u.getUser_id(), u);
-
+		userToReview.put(u.getUser_id(), new HashSet<String>());
+		userToRestaurant.put(u.getUser_id(), new HashSet<String>());
 		return u.toString();
 	}
 }

@@ -45,6 +45,10 @@ public class YelpDBServer {
 	
 	private final List<String> commands; //maybe should be static?
 
+	private static final int GETRESTAURANT = 0;
+	private static final int ADDUSER = 1;
+	private static final int ADDRESTAURANT = 2;
+	private static final int ADDREVIEW = 3;
 	/**
 	 * Make a YelpDBServer that listens for connections on port.
 	 * 
@@ -154,7 +158,23 @@ public class YelpDBServer {
 	}
 	
 	private String prepareReply(String inputLine) {
+		
+		if (inputLine.equals("GETRESTAURANT")) {
+			return getRestaurant(inputLine).toString();
+		}
+		
+		if (inputLine.equals("ADDUSER")) {
+			
+		}
+		if (inputLine.equals("ADDRESTAURANT")) {
+	
+		}
+		if (inputLine.equals("ADDREVIEW")) {
+	
+		}
 		return null;
+		
+		
 	}
 	
 	private synchronized Restaurant getRestaurant(String businessId) {

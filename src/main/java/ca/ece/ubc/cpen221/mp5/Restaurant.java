@@ -265,7 +265,7 @@ public class Restaurant {
 		return price;
 	}
 
-	public void updateRating(long newReview) {
+	public synchronized void updateRating(long newReview) {
 		stars = (stars * review_count + newReview) / (review_count + 1);
 		review_count++;
 	}
