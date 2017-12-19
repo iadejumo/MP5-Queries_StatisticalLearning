@@ -10,6 +10,7 @@ import org.json.simple.JSONObject;
 
 public class User {
 
+	//mutable through changing the average_stars and review_count
 	/*
 	 * Abstraction Function: all fields of this user, which represent a user's
 	 * characteristics
@@ -90,7 +91,7 @@ public class User {
 	}
 
 	// creates random user_id for new user
-	private String generateUser_id() {
+	private synchronized String generateUser_id() {
 		String uniqueID = UUID.randomUUID().toString();
 		uniqueID += name.hashCode();
 
@@ -114,7 +115,7 @@ public class User {
 	}
 
 	// create JsonString of user
-	private String generateJsonString() {
+	private synchronized String generateJsonString() {
 		JSONObject JsonObj = new JSONObject();
 		JsonObj.put("url", this.url);
 		JsonObj.put("votes", this.votes);
@@ -132,7 +133,7 @@ public class User {
 	 * 
 	 * @return String - gets the URL of the website associated with the user
 	 */
-	public String getUrl() {
+	public synchronized String getUrl() {
 		return url;
 	}
 
@@ -142,7 +143,7 @@ public class User {
 	 * @return Map<String,Integer> - such that each String is a reaction and its
 	 *         Integer value is the number of times it has been used
 	 */
-	public Map<String, Integer> getVotes() {
+	public synchronized Map<String, Integer> getVotes() {
 		return Collections.unmodifiableMap(votes);
 	}
 
@@ -151,7 +152,7 @@ public class User {
 	 * 
 	 * @return long - number of reviews written by the User
 	 */
-	public long getReview_count() {
+	public synchronized long getReview_count() {
 		return review_count;
 	}
 
@@ -160,7 +161,7 @@ public class User {
 	 * 
 	 * @return String - the type of User
 	 */
-	public String getType() {
+	public synchronized String getType() {
 		return type;
 	}
 
@@ -169,7 +170,7 @@ public class User {
 	 * 
 	 * @return String - the User's unique ID number
 	 */
-	public String getUser_id() {
+	public synchronized String getUser_id() {
 		return user_id;
 	}
 
@@ -178,7 +179,7 @@ public class User {
 	 * 
 	 * @return String - name of the User
 	 */
-	public String getName() {
+	public synchronized String getName() {
 		return name;
 	}
 
@@ -187,42 +188,13 @@ public class User {
 	 * 
 	 * @return Double - the average star rating given out by the User
 	 */
-	public Double getAverage_stars() {
+	public synchronized Double getAverage_stars() {
 		return average_stars;
 	}
 
-	public void updateRating(long newReview) {
+	public synchronized void updateRating(long newReview) {
 		average_stars = (average_stars * review_count + newReview) / (review_count + 1);
 		review_count++;
-	}
-
-	//note: may remove this equals method if we choose to make its equality only on object equality
-	/**
-	 * checks the equality of this User to other
-	 * 
-	 * @param other
-	 *            - Object to be compared to this in terms of equality
-	 * @return boolean - true if other and this are equal (have the same user_id),
-	 *         else false
-	 */
-	@Override
-	public boolean equals(Object other) {
-		if (other instanceof User) {
-			User otherRes = (User) other;
-			return (this.user_id.equals(otherRes.user_id));
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * returns the Hashcode of the User
-	 * 
-	 * @return int - the hashcode of the User
-	 */
-	@Override
-	public int hashCode() {
-		return user_id.hashCode();
 	}
 
 	/**
@@ -231,7 +203,7 @@ public class User {
 	 * @return String - the String representation of the User
 	 */
 	@Override
-	public String toString() {
+	public synchronized String toString() {
 		return jsonString;
 	}
 }

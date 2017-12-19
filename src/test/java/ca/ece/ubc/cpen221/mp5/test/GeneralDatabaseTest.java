@@ -201,7 +201,7 @@ public class GeneralDatabaseTest {
 		long userInitialRatingCount = users.get(user_id).getReview_count();
 		
 		
-		yelpDB.updateRatingsAndRatingsCount(business_id,user_id , 5);
+		//yelpDB.updateRatingsAndRatingsCount(business_id,user_id , 5);
 		
 		Map<String, User> usersAfter = yelpDB.getUsers();
 		Map<String, Restaurant> restaurantsAfter = yelpDB.getRestaurants();

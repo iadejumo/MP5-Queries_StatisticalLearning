@@ -7,6 +7,7 @@ import org.json.simple.JSONObject;
 
 public class Restaurant {
 
+	// mutable through updating review score
 	/*
 	 * Abstraction Function: all fields of this restaurant, which represent a
 	 * restaurant's characteristics
@@ -114,7 +115,7 @@ public class Restaurant {
 	 * 
 	 * @return boolean - returns true if the Restaurant is open, else false
 	 */
-	public boolean getOpen() {
+	public synchronized boolean getOpen() {
 		return open;
 	}
 
@@ -123,7 +124,7 @@ public class Restaurant {
 	 * 
 	 * @return String - URL of the Restaurant website
 	 */
-	public String getUrl() {
+	public synchronized String getUrl() {
 		return url;
 	}
 
@@ -132,7 +133,7 @@ public class Restaurant {
 	 * 
 	 * @return double - returns the Restaurant's longitude
 	 */
-	public double getLongitude() {
+	public synchronized double getLongitude() {
 		return longitude;
 	}
 
@@ -142,7 +143,7 @@ public class Restaurant {
 	 * @return List<String> - returns List<String> with each string being a
 	 *         neighborhood of the Restaurant
 	 */
-	public List<String> getNeighborhoods() {
+	public synchronized List<String> getNeighborhoods() {
 		return Collections.unmodifiableList(neighborhoods);
 	}
 
@@ -151,7 +152,7 @@ public class Restaurant {
 	 * 
 	 * @return String - the Restaurant's business_id
 	 */
-	public String getBusiness_id() {
+	public synchronized String getBusiness_id() {
 		return business_id;
 	}
 
@@ -160,7 +161,7 @@ public class Restaurant {
 	 * 
 	 * @return String - returns the Restaurant name
 	 */
-	public String getName() {
+	public synchronized String getName() {
 		return name;
 	}
 
@@ -170,7 +171,7 @@ public class Restaurant {
 	 * @return List<String> - returns List<String> with each String being a category
 	 *         of the Restaurant
 	 */
-	public List<String> getCategories() {
+	public synchronized List<String> getCategories() {
 		return Collections.unmodifiableList(categories);
 	}
 
@@ -179,7 +180,7 @@ public class Restaurant {
 	 * 
 	 * @return String - returns the State that the Restaurant is in
 	 */
-	public String getState() {
+	public synchronized String getState() {
 		return state;
 	}
 
@@ -188,7 +189,7 @@ public class Restaurant {
 	 * 
 	 * @return String - the Restaurant's type
 	 */
-	public String getType() {
+	public synchronized String getType() {
 		return type;
 	}
 
@@ -197,7 +198,7 @@ public class Restaurant {
 	 * 
 	 * @return double - average number of stars in the rating of the Restaurant
 	 */
-	public double getStars() {
+	public synchronized double getStars() {
 		return stars;
 	}
 
@@ -206,7 +207,7 @@ public class Restaurant {
 	 * 
 	 * @return the city that the Restaurant is in
 	 */
-	public String getCity() {
+	public synchronized String getCity() {
 		return city;
 	}
 
@@ -215,7 +216,7 @@ public class Restaurant {
 	 * 
 	 * @return String - the full address of the Restaurant
 	 */
-	public String getFull_address() {
+	public synchronized String getFull_address() {
 		return full_address;
 	}
 
@@ -224,7 +225,7 @@ public class Restaurant {
 	 * 
 	 * @return long - the number of reviews that the Restaurant has
 	 */
-	public long getReview_count() {
+	public synchronized long getReview_count() {
 		return review_count;
 	}
 
@@ -233,7 +234,7 @@ public class Restaurant {
 	 * 
 	 * @return String - the URL of the website with the Restaurant photo
 	 */
-	public String getPhoto_url() {
+	public synchronized String getPhoto_url() {
 		return photo_url;
 	}
 
@@ -243,7 +244,7 @@ public class Restaurant {
 	 * @return List<String> - returns List<String> with each String being a school
 	 *         near the Restaurant
 	 */
-	public List<String> getSchools() {
+	public synchronized List<String> getSchools() {
 		return Collections.unmodifiableList(schools);
 	}
 
@@ -252,7 +253,7 @@ public class Restaurant {
 	 * 
 	 * @return double - returns the latitude of the Restaurant
 	 */
-	public double getLatitude() {
+	public synchronized double getLatitude() {
 		return latitude;
 	}
 
@@ -261,7 +262,7 @@ public class Restaurant {
 	 * 
 	 * @return long - returns the price rating of the Restaurant
 	 */
-	public long getPrice() {
+	public synchronized long getPrice() {
 		return price;
 	}
 
@@ -270,43 +271,13 @@ public class Restaurant {
 		review_count++;
 	}
 
-	
-	//note: may remove this equals method if we choose to make its equality only on object equality
-	/**
-	 * checks the equality of this Restaurant to other
-	 * 
-	 * @param other
-	 *            - Object to be compared to this in terms of equality
-	 * @return boolean - true if other and this are equal (have the same
-	 *         business_id), else false
-	 */
-	@Override
-	public boolean equals(Object other) {
-		if (other instanceof Restaurant) {
-			Restaurant otherRes = (Restaurant) other;
-			return (this.business_id.equals(otherRes.business_id));
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * returns the Hashcode of the Restaurant
-	 * 
-	 * @return int - the hashcode of the Restaurant
-	 */
-	@Override
-	public int hashCode() {
-		return business_id.hashCode();
-	}
-
 	/**
 	 * returns the String representation of the Restaurant
 	 * 
 	 * @return String - the String representation of the Restaurant
 	 */
 	@Override
-	public String toString() {
+	public synchronized String toString() {
 		return jsonString;
 	}
 
