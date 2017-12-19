@@ -3,7 +3,10 @@ package ca.ece.ubc.cpen221.mp5;
 import java.util.Collections;
 import java.util.List;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class Restaurant {
 
@@ -266,10 +269,22 @@ public class Restaurant {
 		return price;
 	}
 
-	public synchronized void updateRating(long newReview) {
+	public synchronized void updateRating(long newReview) throws ParseException{
 		stars = (stars * review_count + newReview) / (review_count + 1);
 		review_count++;
+		updateJsonString();
 	}
+	
+	private synchronized void updateJsonString() throws ParseException {
+		JSONParser parser = new JSONParser();
+		Object obj;
+		obj = parser.parse(jsonString);
+		JSONObject jsonObject = (JSONObject) obj;
+		jsonObject.put("review_count", review_count);
+		jsonObject.put("stars", stars);
+		jsonString = jsonObject.toString();
+	}
+
 
 	/**
 	 * returns the String representation of the Restaurant

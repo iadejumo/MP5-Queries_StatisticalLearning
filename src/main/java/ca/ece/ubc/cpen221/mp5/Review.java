@@ -7,6 +7,8 @@ import org.json.simple.JSONObject;
 
 public class Review {
 
+	//immutable object, so overrides equals and hashcode
+	
 	/*
 	 * Abstraction Function: all fields of this Review, which represent a review's
 	 * characteristics

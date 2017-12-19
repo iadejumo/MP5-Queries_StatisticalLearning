@@ -7,6 +7,8 @@ import java.util.Random;
 import java.util.UUID;
 
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class User {
 
@@ -192,9 +194,20 @@ public class User {
 		return average_stars;
 	}
 
-	public synchronized void updateRating(long newReview) {
+	public synchronized void updateRating(long newReview) throws ParseException {
 		average_stars = (average_stars * review_count + newReview) / (review_count + 1);
 		review_count++;
+		updateJsonString();
+	}
+		
+	private synchronized void updateJsonString() throws ParseException {
+		JSONParser parser = new JSONParser();
+		Object obj;
+		obj = parser.parse(jsonString);
+		JSONObject jsonObject = (JSONObject) obj;
+		jsonObject.put("review_count", review_count);
+		jsonObject.put("average_stars", average_stars);
+		jsonString = jsonObject.toString();
 	}
 
 	/**
