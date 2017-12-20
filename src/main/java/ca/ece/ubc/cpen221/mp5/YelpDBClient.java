@@ -97,9 +97,10 @@ public class YelpDBClient {
 	            TimeUnit.SECONDS.sleep(1);
 	            
 	            System.out.println("Answer5: "+client.getReply());
+	            TimeUnit.SECONDS.sleep(1);
 	            
 	            System.out.println("Answer6: "+client.getReply());
-	            System.out.println("Answer7: "+client.getReply());
+
 	  
 	            client.close();
 	        } catch (IOException ioe) {

@@ -171,30 +171,34 @@ public class YelpDBServer {
 	}
 
 	private String prepareReply(String inputLine) throws ParseException, NoSuchRestaurantException, InvalidUserStringException, InvalidReviewStringException, NoSuchUserException, InvalidRestaurantStringException, InvalidCommandException {
-	
-		String command = getCommand(inputLine);
-		String data = getData(inputLine);
-		System.err.println("Command: " + command);
-		System.err.println("Data: " + data);
-		if (inputLine.startsWith(GETRESTAURANT)) {
+		if (inputLine.toUpperCase().startsWith(GETRESTAURANT)) {
+			String data = inputLine.substring(GETRESTAURANT.length()).trim();
+			System.err.println("Data: " + data);
 			Restaurant r = yelpDB.getRestaurants().get(data);
 			if (r == null)
 				throw new NoSuchRestaurantException();
 			return r.toString();
 		}
 		
-		else if (inputLine.startsWith(ADDUSER)) {
+		else if (inputLine.toUpperCase().startsWith(ADDUSER)) {
+			String data = inputLine.substring(ADDUSER.length()).trim();
+			System.err.println("Data: " + data);
 			return yelpDB.addUser(data);
 		}
-		
-		else if (command.startsWith(ADDRESTAURANT)) {
+			
+		else if (inputLine.toUpperCase().startsWith(ADDRESTAURANT)) {
+			String data = inputLine.substring(ADDRESTAURANT.length()).trim();
+			System.err.println("Data: " + data);
 			return yelpDB.addRestaurant(data);
 		}
 		
-		else if (command.startsWith(ADDREVIEW)) {
+		else if (inputLine.toUpperCase().startsWith(ADDREVIEW)) {
+			String data = inputLine.substring(ADDREVIEW.length()).trim();
+			System.err.println("Data: " + data);
 			return yelpDB.addReview(data);
 		}
-		else if (command.equals(""))
+		
+		else if (inputLine.equals(""))
 			return "BLANK INPUT, SO NO OUTPUT";
 		else
 			throw new InvalidCommandException();
