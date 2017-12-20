@@ -65,43 +65,44 @@ public class YelpDBClient {
 	            System.out.println("Answer0: "+client.getReply());
 	            TimeUnit.SECONDS.sleep(1);
 	            */
+	            int timeDelay = 3;
 	            client.sendRequest("GETRESTAURANT gclB3ED6uk6viWlolSb_uA");
 	            System.out.println("Asked1: GETRESTAURANT gclB3ED6uk6viWlolSb_uA");
-	            TimeUnit.SECONDS.sleep(1);
+	            TimeUnit.SECONDS.sleep(timeDelay);
           
 	            System.out.println("Answer1: "+client.getReply());
-	            TimeUnit.SECONDS.sleep(1);
+	            TimeUnit.SECONDS.sleep(timeDelay);
 	            
 	            client.sendRequest("ADDUSER {\"name\": \"Sathish G.\"}");
 	            System.out.println("Asked2: ADDUSER {\"name\": \"Sathish G.\"}");
-	            TimeUnit.SECONDS.sleep(1);
+	            TimeUnit.SECONDS.sleep(timeDelay);
 	            
 	            System.out.println("Answer2: "+client.getReply());
-	            TimeUnit.SECONDS.sleep(1);
+	            TimeUnit.SECONDS.sleep(timeDelay);
 	            
 	            client.sendRequest("ADDUSER {\"name\": \"Tyler L.\"}");
 	            System.out.println("Asked3: ADDUSER {\"name\": \"Tyler L.\"}");
-	            TimeUnit.SECONDS.sleep(1);
+	            TimeUnit.SECONDS.sleep(timeDelay);
 	            
 	            System.out.println("Answer3: "+client.getReply());
-	            TimeUnit.SECONDS.sleep(1);
+	            TimeUnit.SECONDS.sleep(timeDelay);
 	            
 	            client.sendRequest("ADDUSER {\"name\": Tyler L.\"}");
 	            System.out.println("Asked4: ADDUSER {\"name\": Tyler L.\"}, should be error");
-	            TimeUnit.SECONDS.sleep(1);
+	            TimeUnit.SECONDS.sleep(timeDelay);
 	            
 	            System.out.println("Answer4: "+client.getReply());
 	  
-	            client.sendRequest("ADDREVIEW {\"name\": Tyler L.\"}");
+	            client.sendRequest("ADDREVIEW {\"name\": \"Tyler L.\"}");
 	            System.out.println("Asked5: ADDREVIEW {\"name\": Tyler L.\"}, should be error");
-	            TimeUnit.SECONDS.sleep(1);
+	            TimeUnit.SECONDS.sleep(timeDelay);
 	            
 	            System.out.println("Answer5: "+client.getReply());
-	            TimeUnit.SECONDS.sleep(1);
+	            TimeUnit.SECONDS.sleep(timeDelay);
 	            
 	            System.out.println("Answer6: "+client.getReply());
 
-	  
+	            TimeUnit.SECONDS.sleep(timeDelay*10);
 	            client.close();
 	        } catch (IOException ioe) {
 	            ioe.printStackTrace();

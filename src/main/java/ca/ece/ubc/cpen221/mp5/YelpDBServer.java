@@ -39,7 +39,7 @@ public class YelpDBServer {
 	private final YelpDB yelpDB;
 
 	private ServerSocket serverSocket;
-	public static final int YELPDB_PORT = 4948;
+	public static final int YELPDB_PORT = 4949;
 
 	private final String userFile = "data/users.json";
 	private final String restaurantFile = "data/restaurants.json";
@@ -49,6 +49,7 @@ public class YelpDBServer {
 	public static final String ADDUSER = "ADDUSER";
 	public static final String ADDRESTAURANT = "ADDRESTAURANT";
 	public static final String ADDREVIEW = "ADDREVIEW";
+	public static final String QUERY = "QUERY";
 
 	/**
 	 * Make a YelpDBServer that listens for connections on port.
@@ -132,11 +133,12 @@ public class YelpDBServer {
 					System.err.println("request: " + line);
 					try {
 						// get answer and send back to client
-						String reply = prepareReply(line);
+						String reply = prepareReply(line.trim());
 						System.err.println("reply: " + reply);
 						out.println(reply);
 					} catch (InvalidUserStringException iuse) {
 						// complain about error in format of request
+						System.err.println(iuse.getStackTrace());
 						System.err.println("reply: ERR: INVALID_USER_STRING");
 						out.println("ERR: INVALID_USER_STRING\n");
 					} catch (InvalidRestaurantStringException irese) {
@@ -159,6 +161,12 @@ public class YelpDBServer {
 						// complain about error in format of request
 						System.err.println("reply: ERR: INVALID_COMMAND");
 						out.println("ERR: INVALID_COMMAND\n");
+					} catch (NoMatchesException nme) {
+						System.err.println("reply: ERR: NO_MATCH");
+						out.println("ERR: NO_MATCH\n");
+					} catch (InvalidQueryException iqe) {
+						System.err.println("reply: ERR: INVALID_QUERY");
+						out.println("ERR: INVALID_QUERY\n");
 					}
 					// important! our PrintWriter is auto-flushing, but if not
 					// out.flush();
@@ -198,27 +206,17 @@ public class YelpDBServer {
 			return yelpDB.addReview(data);
 		}
 		
+		else if (inputLine.toUpperCase().startsWith(QUERY)) {
+			String data = inputLine.substring(ADDREVIEW.length()).trim();
+			System.err.println("Data: " + data);
+			return yelpDB.getMatches(data).toString();
+		}
+		
 		else if (inputLine.equals(""))
 			return "BLANK INPUT, SO NO OUTPUT";
 		else
 			throw new InvalidCommandException();
 	}
-	
-
-	private String getCommand(String inputLine) {
-		int spaceIndex = inputLine.indexOf(" ");
-		if (spaceIndex==-1)
-			return "";
-		return inputLine.substring(0, spaceIndex);
-	}
-
-	private String getData(String inputLine) {
-		int spaceIndex = inputLine.indexOf(" ");
-		if (spaceIndex==-1)
-			return "";
-		return inputLine.substring(spaceIndex + 1);
-	}
-
 	
 
 	/**

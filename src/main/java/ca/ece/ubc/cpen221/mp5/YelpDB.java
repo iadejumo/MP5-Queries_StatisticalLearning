@@ -652,12 +652,16 @@ public class YelpDB implements MP5Db<Restaurant> {
 
 	public synchronized String addRestaurant(String restaurantJsonString) throws InvalidRestaurantStringException {
 		try {
-			Restaurant r = new Restaurant(createJsonObj(restaurantJsonString));
+			JSONObject jObj = createJsonObj(restaurantJsonString);
+			if (!checkIfRestaurantJson(jObj)) 
+				throw new Exception();
+			
+			Restaurant r = new Restaurant(jObj);
 			restaurants.put(r.getBusiness_id(), r);
 			restaurantToReview.put(r.getBusiness_id(), new HashSet<String>());
 			System.out.println("New Restaurant: "+r.toString());
 			return r.toString();
-		} catch (ParseException e) {
+		} catch (Exception e) {
 			throw new InvalidRestaurantStringException();
 		}
 		
@@ -665,14 +669,15 @@ public class YelpDB implements MP5Db<Restaurant> {
 	
 	public synchronized String addReview(String reviewJsonString) throws InvalidReviewStringException, NoSuchUserException, NoSuchRestaurantException {
 		try {
-			Review r = new Review(createJsonObj(reviewJsonString));
-			System.out.println("4");
+			JSONObject jObj = createJsonObj(reviewJsonString);
+			if (!checkIfReviewJson(jObj)) 
+				throw new IOException();
+			
+			Review r = new Review(jObj);
 			if (!users.containsKey(r.getUser_id()))
 				throw new NoSuchUserException();
-			System.out.println("5");
 			if (!restaurants.containsKey(r.getBusiness_id()))
 				throw new NoSuchRestaurantException();
-			System.out.println("6");
 			reviews.put(r.toString(), r);
 			userToReview.get(r.getUser_id()).add(r.getReview_id());
 			userToRestaurant.get(r.getUser_id()).add(r.getBusiness_id());
@@ -681,16 +686,24 @@ public class YelpDB implements MP5Db<Restaurant> {
 			System.out.println("New Review: " + r.toString());
 			return r.toString();
 		} catch (ParseException e) {
-			System.out.println("1");
 			throw new InvalidReviewStringException(); //note may need to check that the updateRatings function is not causing this exception to be thrown
-		} catch (NoSuchUserException nsue) {
-			System.out.println("2");
+		} catch (IOException e) {
+			throw new InvalidReviewStringException(); //note may need to check that the updateRatings function is not causing this exception to be thrown
+		}catch (NoSuchUserException nsue) {
 			throw new NoSuchUserException();
 		} catch (NoSuchRestaurantException nsre) {
-			System.out.println("3");
 			throw new NoSuchRestaurantException();
 		}
 		
+	}
+	
+	private static final String userFile = "data/users.json";
+	private static final String restaurantFile = "data/restaurants.json";
+	private static final String reviewFile = "data/reviews.json";
+	
+	public static void main(String[] args) throws ParseException, IOException, InvalidReviewStringException, NoSuchUserException, NoSuchRestaurantException {
+		YelpDB y = new YelpDB(restaurantFile, reviewFile, userFile);
+		System.out.println(y.addReview("{\"name\": Tyler L.\"}"));
 	}
 	/**
 	 * Creates/ initializes a new user and adds them to the database
@@ -702,22 +715,44 @@ public class YelpDB implements MP5Db<Restaurant> {
 	 */
 	public synchronized String addUser(String userJsonString) throws InvalidUserStringException {
 		try {
-			String name = ((String)createJsonObj(userJsonString).get("name"));
+			JSONObject jObj = createJsonObj(userJsonString);
+			if (!checkIfUserJson(jObj)) 
+				throw new Exception();
+			
+			String name = ((String) jObj.get("name"));
 			User u = new User(name);
 			users.put(u.getUser_id(), u);
 			userToReview.put(u.getUser_id(), new HashSet<String>());
 			userToRestaurant.put(u.getUser_id(), new HashSet<String>());
-			System.out.println("New User: "+ u.toString());
+			System.out.println("New User: " + u.toString());
 			return u.toString();
-		} catch (ParseException e) {
+		} catch (Exception e) {
 			throw new InvalidUserStringException();
 		}
 	}
 	
+	private boolean checkIfReviewJson(JSONObject jObj) {
+		if (jObj.get("business_id") == null || jObj.get("votes") == null || jObj.get("text") == null || jObj.get("stars") == null || jObj.get("user_id") == null || jObj.get("date") == null )
+			return false;
+		return true;	
+	}
+	
+	private boolean checkIfRestaurantJson(JSONObject jObj) {
+		if (jObj.get("open") == null || jObj.get("url") == null || jObj.get("longitude") == null || jObj.get("neighborhoods") == null || jObj.get("name") == null || jObj.get("categories") == null || jObj.get("state") == null|| jObj.get("city") == null || jObj.get("full_address") == null || jObj.get("photo_url") == null || jObj.get("schools") == null || jObj.get("latitude") == null || jObj.get("price") == null)
+			return false;
+		return true;	
+	}
+	private boolean checkIfUserJson(JSONObject jObj) {
+		if (jObj.get("name") == null)
+			return false;
+		return true;
+	}
 	private synchronized JSONObject createJsonObj(String jsonString) throws ParseException {
 		JSONParser parser = new JSONParser();
 		Object obj;
 		obj = parser.parse(jsonString);
 		return (JSONObject)obj;
 	}
+	
+	
 }
