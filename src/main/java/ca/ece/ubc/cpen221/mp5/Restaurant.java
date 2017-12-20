@@ -10,8 +10,8 @@ import org.json.simple.parser.ParseException;
 
 public class Restaurant {
 
-	// mutable through updating review score
-	
+	// mutable through updating review score, so equals and hashcode not overrided
+
 	/*
 	 * Abstraction Function: all fields of this restaurant, which represent a
 	 * restaurant's characteristics
@@ -270,12 +270,25 @@ public class Restaurant {
 		return price;
 	}
 
-	public synchronized void updateRating(long newReview) throws ParseException{
+	/**
+	 * updates the Restaurant with the given new Review rating
+	 * 
+	 * @param newReview
+	 *            - long of the new review rating score to be added to the
+	 *            Restaurant
+	 * @return nothing
+	 * @modifies this - increments review_count by 1, updates stars to show a new
+	 *           average, and updates the Json String of this
+	 */
+	public synchronized void updateRating(long newReview) throws ParseException {
 		stars = (stars * review_count + newReview) / (review_count + 1);
 		review_count++;
 		updateJsonString();
 	}
-	
+
+	// updates the JsonString of this
+	// only needs to update the fields for review_count and stars because those are
+	// the only fields to ever be changed
 	private synchronized void updateJsonString() throws ParseException {
 		JSONParser parser = new JSONParser();
 		Object obj;
@@ -285,7 +298,6 @@ public class Restaurant {
 		jsonObject.put("stars", stars);
 		jsonString = jsonObject.toString();
 	}
-
 
 	/**
 	 * returns the String representation of the Restaurant

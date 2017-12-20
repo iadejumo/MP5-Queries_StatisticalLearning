@@ -11,7 +11,9 @@ import org.json.simple.parser.ParseException;
 
 public class User {
 
-	//mutable through changing the average_stars and review_count
+	// mutable through changing the average_stars and review_count, so not
+	// overriding equals or hashcode
+
 	/*
 	 * Abstraction Function: all fields of this user, which represent a user's
 	 * characteristics
@@ -193,12 +195,24 @@ public class User {
 		return average_stars;
 	}
 
+	/**
+	 * updates this with the given new Review rating
+	 * 
+	 * @param newReview
+	 *            - long of the new review rating score to be added by this User
+	 * @return nothing
+	 * @modifies this - increments review_count by 1, updates average_stars to show
+	 *           a new average, and updates the Json String of this
+	 */
 	public synchronized void updateRating(long newReview) throws ParseException {
 		average_stars = (average_stars * review_count + newReview) / (review_count + 1);
 		review_count++;
 		updateJsonString();
 	}
-		
+
+	// updates the JsonString of this
+	// only needs to update the fields for review_count and average_stars because
+	// those are the only fields to ever be changed
 	private synchronized void updateJsonString() throws ParseException {
 		JSONParser parser = new JSONParser();
 		Object obj;

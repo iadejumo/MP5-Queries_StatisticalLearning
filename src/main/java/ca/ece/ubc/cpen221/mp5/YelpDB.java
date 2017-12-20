@@ -272,16 +272,18 @@ public class YelpDB implements MP5Db<Restaurant> {
 		return new HashMap<String, User>(users);
 	}
 
-	// Uncompleted (Part 5)
+	/**
+	 * Perform a structured query and return the set of objects that matches the
+	 * query
+	 * 
+	 * @param queryString
+	 * @return the set of objects that matches the query
+	 */
 	@Override
 	public synchronized Set getMatches(String queryString){
-		// TODO Auto-generated method stub
-		
 		return parseInput(queryString);
 	}
 
-	// Uncompleted (Part 5)
-	// TODO Change back to private
 	private Set<String> parseInput(String input){
 		CharStream stream = new ANTLRInputStream(input);
 
@@ -508,9 +510,17 @@ public class YelpDB implements MP5Db<Restaurant> {
 		}
 	}
 
+	/**
+	 * 
+	 * @param user
+	 *            represents a user_id in the database
+	 * @return a function that predicts the user's ratings for objects (of type
+	 *         T) in the database of type MP5Db<T>. The function that is
+	 *         returned takes two arguments: one is the database and other other
+	 *         is a String that represents the id of an object of type T.
+	 */
 	@Override
 	public synchronized ToDoubleBiFunction<MP5Db<Restaurant>, String> getPredictorFunction(String user) {
-		// TODO Auto-generated method stub
 		List<Long> prices = new ArrayList<Long>();
 		List<Long> ratings = new ArrayList<Long>();
 		List<Double> avgList = getUserRatingAndPrice(user, prices, ratings);
@@ -632,7 +642,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 
 		double b = sxy / sxx;
 		double a = meanY - b * meanX;
-		double r_squared = Math.pow(sxy, 2) / (sxx * syy);
+		double r_squared = Math.pow(sxy, 2) / (sxx * syy); //kept here because asked for in README
 
 		ToDoubleBiFunction<MP5Db<Restaurant>, String> predictor = new ToDoubleBiFunctionModified(a, b);
 
@@ -660,6 +670,13 @@ public class YelpDB implements MP5Db<Restaurant> {
 		users.get(user_id).updateRating(newRating);	
 	} //must be done to ensure no bad interleavings!
 
+	/**
+	 * Cluster objects into k clusters using k-means clustering
+	 * 
+	 * @param k
+	 *            number of clusters to create (0 < k <= (number of objects)/3 (weakened specs) )
+	 * @return a String, in JSON format, that represents the clusters
+	 */
 	public synchronized String addRestaurant(String restaurantJsonString) throws InvalidRestaurantStringException {
 		try {
 			JSONObject jObj = createJsonObj(restaurantJsonString);
