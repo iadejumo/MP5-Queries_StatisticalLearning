@@ -2,21 +2,7 @@ grammar QueryGrammar;
 
 @header {
 package ca.ece.ubc.cpen221.mp5;
-}
-
-@parser::members {
-  @Override
-  public void reportError(RecognitionException e) {
-    throw new RuntimeException("I quit!\n" + e.getMessage()); 
-  }
-}
-
-@lexer::members {
-  @Override
-  public void reportError(RecognitionException e) {
-    throw new RuntimeException("I quit!\n" + e.getMessage()); 
-  }
-}
+}	
 
 //Terminals: Lexer
 OR  : '||';
@@ -32,16 +18,14 @@ NUM  : [1-5]+;
 LPAREN  : '(';
 RPAREN  : ')';
 WORD  :  [a-zA-Z0-9]+;
-SYMBOLS  :  '\''|'('|')'|'-'|'&';
-//WORD  :  ~[()];
-
+SYMBOLS  :  ('\''|'/'|'('|')'|'-'|'&'|'.')+;
 WS  : (' '|'\t'|'\r'|'\n')+;
 
 //Non-terminals: Parser
 root  :  orExpr EOF;
 
-orExpr : andExpr (WS? OR andExpr)*;
-andExpr  : WS? atom (WS? AND WS? atom)*;
+orExpr : andExpr WS? (WS? OR andExpr)*;
+andExpr  : WS? atom WS? (WS? AND WS? atom)*;
 atom  : in|category|rating|price|name|(LPAREN orExpr RPAREN);
 
 in  : 'in' WS? LPAREN string RPAREN; 
@@ -51,5 +35,5 @@ rating  : 'rating' WS? INEQ WS? NUM;
 price  : 'price' WS? INEQ WS? NUM; 
 
 //WORD  :  .+;
-string  : (WS? WORD WS?)+ (WS? SYMBOLS? WS? string)*;
+string  : (WS? WORD WS?)+ (WS? SYMBOLS? WS? string WS?)*;
 //string  : .+;

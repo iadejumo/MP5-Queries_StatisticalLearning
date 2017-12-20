@@ -15,6 +15,7 @@ import java.util.Set;
 
 import javax.json.JsonObject;
 
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -164,7 +165,7 @@ public class YelpDBServer {
 					} catch (NoMatchesException nme) {
 						System.err.println("reply: ERR: NO_MATCH");
 						out.println("ERR: NO_MATCH\n");
-					} catch (InvalidQueryException iqe) {
+					} catch (ParseCancellationException pce) { //Changed to the antlr default exception
 						System.err.println("reply: ERR: INVALID_QUERY");
 						out.println("ERR: INVALID_QUERY\n");
 					}

@@ -18,6 +18,7 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.json.simple.JSONArray;
@@ -273,7 +274,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 
 	// Uncompleted (Part 5)
 	@Override
-	public synchronized Set getMatches(String queryString) {
+	public synchronized Set getMatches(String queryString){
 		// TODO Auto-generated method stub
 		
 		return parseInput(queryString);
@@ -281,26 +282,35 @@ public class YelpDB implements MP5Db<Restaurant> {
 
 	// Uncompleted (Part 5)
 	// TODO Change back to private
-	private Set<String> parseInput(String input) {
+	private Set<String> parseInput(String input){
 		CharStream stream = new ANTLRInputStream(input);
 
 		QueryGrammarLexer lexer = new QueryGrammarLexer(stream);
+		lexer.removeErrorListeners();
+		lexer.addErrorListener(ThrowingErrorListener.INSTANCE);
+		
 		TokenStream tokens = new CommonTokenStream(lexer);
 
 		QueryGrammarParser parser = new QueryGrammarParser(tokens);
+		parser.removeErrorListeners();
+		parser.addErrorListener(ThrowingErrorListener.INSTANCE);
 
 		ParseTree tree = parser.root();
 
 		System.err.println(tree.toStringTree(parser));
-		// ((RuleContext) tree).inspect((Parser)parser);
+
 		ParseTreeWalker walker = new ParseTreeWalker();
-		
 		
 		QueryGrammarListener listener = new ExpressionEvalution(this);
 		
 		walker.walk(listener, tree);
 		
 		List<String> matches = ((ExpressionEvalution) listener).returnResults();
+		
+		if (matches.size() == 0) {
+			throw new NoMatchesException();
+		}
+		
 		System.out.println(((ExpressionEvalution) listener).returnResults().size());
 		
 		return mapBusinessToJSONString(matches);
