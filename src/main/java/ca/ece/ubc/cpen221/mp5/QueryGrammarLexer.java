@@ -77,6 +77,12 @@ public class QueryGrammarLexer extends Lexer {
 	}
 
 
+	  @Override
+	  public void reportError(RecognitionException e) {
+	    throw new RuntimeException("I quit!\n" + e.getMessage()); 
+	  }
+
+
 	public QueryGrammarLexer(CharStream input) {
 		super(input);
 		_interp = new LexerATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);

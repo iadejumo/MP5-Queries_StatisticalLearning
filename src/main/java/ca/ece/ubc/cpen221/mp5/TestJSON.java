@@ -32,14 +32,17 @@ public class TestJSON {
 		String s2 = "price <= 2";
 		String s3 = "price <= 2 && in(Telegraph Ave)";
 		String s4 = "category(Chinese) || category(Italian)";
+		String s5 = "on(Telegraph Ave)";
 		
-		yelpDB.parseInput(s);
-		yelpDB.parseInput(s2);
-		yelpDB.parseInput(s3);
-		yelpDB.parseInput(s1);
+		System.out.println(yelpDB.getMatches(s));
+		System.out.println(yelpDB.getMatches(s1));
+		System.out.println(yelpDB.getMatches(s2));
+		System.out.println(yelpDB.getMatches(s3));
+		System.out.println(yelpDB.getMatches(s4));
+		System.out.println(yelpDB.getMatches(s5));
+
 		
 		//System.out.println(predicted);
-		
 		
     }
 	

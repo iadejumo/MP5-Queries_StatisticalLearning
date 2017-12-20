@@ -83,6 +83,12 @@ public class QueryGrammarParser extends Parser {
 	@Override
 	public ATN getATN() { return _ATN; }
 
+
+	  @Override
+	  public void reportError(RecognitionException e) {
+	    throw new RuntimeException("I quit!\n" + e.getMessage()); 
+	  }
+
 	public QueryGrammarParser(TokenStream input) {
 		super(input);
 		_interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);

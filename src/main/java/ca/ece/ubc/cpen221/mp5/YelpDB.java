@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.ToDoubleBiFunction;
+import java.util.stream.Collectors;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
@@ -23,6 +24,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+
+import com.google.gson.Gson;
 
 public class YelpDB implements MP5Db<Restaurant> {
 
@@ -272,12 +275,13 @@ public class YelpDB implements MP5Db<Restaurant> {
 	@Override
 	public synchronized Set getMatches(String queryString) {
 		// TODO Auto-generated method stub
-		return null;
+		
+		return parseInput(queryString);
 	}
 
 	// Uncompleted (Part 5)
 	// TODO Change back to private
-	public void parseInput(String input) {
+	private Set<String> parseInput(String input) {
 		CharStream stream = new ANTLRInputStream(input);
 
 		QueryGrammarLexer lexer = new QueryGrammarLexer(stream);
@@ -296,8 +300,18 @@ public class YelpDB implements MP5Db<Restaurant> {
 		
 		walker.walk(listener, tree);
 		
+		List<String> matches = ((ExpressionEvalution) listener).returnResults();
 		System.out.println(((ExpressionEvalution) listener).returnResults().size());
 		
+		return mapBusinessToJSONString(matches);
+	}
+	
+	private Set<String> mapBusinessToJSONString (List<String> businessIDMatches){
+		
+		Set<String> setOfMatches = businessIDMatches.stream()
+		.map(x -> restaurants.get(x).toString()).collect(Collectors.toSet());
+		
+		return setOfMatches;
 	}
 
 	/**

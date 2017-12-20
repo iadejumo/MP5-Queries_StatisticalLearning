@@ -4,6 +4,20 @@ grammar QueryGrammar;
 package ca.ece.ubc.cpen221.mp5;
 }
 
+@parser::members {
+  @Override
+  public void reportError(RecognitionException e) {
+    throw new RuntimeException("I quit!\n" + e.getMessage()); 
+  }
+}
+
+@lexer::members {
+  @Override
+  public void reportError(RecognitionException e) {
+    throw new RuntimeException("I quit!\n" + e.getMessage()); 
+  }
+}
+
 //Terminals: Lexer
 OR  : '||';
 AND  : '&&';
