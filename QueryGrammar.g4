@@ -4,9 +4,7 @@ grammar QueryGrammar;
 package ca.ece.ubc.cpen221.mp5;
 }
 
-orExpr : andExpr (WS? OR andExpr)*;
-andExpr  : WS? atom (WS? AND WS? atom)*;
-atom  : in |category|rating|price|name|LPAREN orExpr RPAREN;
+//Terminals: Lexer
 OR  : '||';
 AND  : '&&';
 INEQ : GT|GTE|LT|LTE|EQ; 
@@ -16,14 +14,28 @@ LT  : '<';
 LTE  : '<=';
 EQ  : '=';
 NUM  : [1-5]+;
-in  : 'in' LPAREN string RPAREN; 
-category  : 'category' WS? LPAREN string RPAREN; 
+
+LPAREN  : '(';
+RPAREN  : ')';
+WORD  :  [a-zA-Z0-9]+;
+SYMBOLS  :  '\''|'('|')'|'-'|'&';
+//WORD  :  ~[()];
+
+WS  : (' '|'\t'|'\r'|'\n')+;
+
+//Non-terminals: Parser
+root  :  orExpr EOF;
+
+orExpr : andExpr (WS? OR andExpr)*;
+andExpr  : WS? atom (WS? AND WS? atom)*;
+atom  : in|category|rating|price|name|(LPAREN orExpr RPAREN);
+
+in  : 'in' WS? LPAREN string RPAREN; 
+category  : 'category' WS? LPAREN string RPAREN;
 name  : 'name' WS? LPAREN string RPAREN;
 rating  : 'rating' WS? INEQ WS? NUM; 
 price  : 'price' WS? INEQ WS? NUM; 
-LPAREN  : '(';
-RPAREN  : ')';
-//WORD  :  [a-zA-Z]+[0-9]?.?;
-//string  : (WORD+ WS?)+;
-string  : .+;
-WS  : ' ';
+
+//WORD  :  .+;
+string  : (WS? WORD WS?)+ (WS? SYMBOLS? WS? string)*;
+//string  : .+;
