@@ -13,6 +13,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.ToDoubleBiFunction;
 
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -267,6 +273,31 @@ public class YelpDB implements MP5Db<Restaurant> {
 	public synchronized Set getMatches(String queryString) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	// Uncompleted (Part 5)
+	// TODO Change back to private
+	public void parseInput(String input) {
+		CharStream stream = new ANTLRInputStream(input);
+
+		QueryGrammarLexer lexer = new QueryGrammarLexer(stream);
+		TokenStream tokens = new CommonTokenStream(lexer);
+
+		QueryGrammarParser parser = new QueryGrammarParser(tokens);
+
+		ParseTree tree = parser.root();
+
+		System.err.println(tree.toStringTree(parser));
+		// ((RuleContext) tree).inspect((Parser)parser);
+		ParseTreeWalker walker = new ParseTreeWalker();
+		
+		
+		QueryGrammarListener listener = new ExpressionEvalution(this);
+		
+		walker.walk(listener, tree);
+		
+		System.out.println(((ExpressionEvalution) listener).returnResults().size());
+		
 	}
 
 	/**

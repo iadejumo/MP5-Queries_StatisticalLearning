@@ -7,11 +7,19 @@
 	<buildSpec>
 		<buildCommand>
 			<name>org.eclipse.jdt.core.javabuilder</name>
+<<<<<<< HEAD
+=======
 			<arguments>
 			</arguments>
 		</buildCommand>
 		<buildCommand>
 			<name>org.eclipse.buildship.core.gradleprojectbuilder</name>
+>>>>>>> GeneratingQueries
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.xtext.ui.shared.xtextBuilder</name>
 			<arguments>
 			</arguments>
 		</buildCommand>
