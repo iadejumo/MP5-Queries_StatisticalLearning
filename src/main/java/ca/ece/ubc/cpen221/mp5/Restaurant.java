@@ -11,6 +11,7 @@ import org.json.simple.parser.ParseException;
 public class Restaurant {
 
 	// mutable through updating review score
+	
 	/*
 	 * Abstraction Function: all fields of this restaurant, which represent a
 	 * restaurant's characteristics
@@ -39,20 +40,20 @@ public class Restaurant {
 	private String url;
 	private double longitude;
 	private List<String> neighborhoods;
-	private String business_id;
+	private String business_id; //
 	private String name;
 	private List<String> categories;
 	private String state;
-	private String type;
-	private double stars;
+	private String type; //
+	private double stars; //
 	private String city;
 	private String full_address;
-	private long review_count;
+	private long review_count; //
 	private String photo_url;
 	private List<String> schools;
 	private double latitude;
 	private long price;
-	private String jsonString;
+	private String jsonString; //
 
 	/**
 	 * Creates a Restaurant object
