@@ -17,6 +17,7 @@ import javax.json.JsonObject;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class YelpDBServer {
@@ -33,22 +34,17 @@ public class YelpDBServer {
 	// data in handle
 	// filenames are private and final and String, so its reference and object
 	// values are fully immutable
-	// commands is only ever read from NEVER WRITTEN TO after constructor and is immutable
+	// commands is only ever read from NEVER WRITTEN TO after constructor and is
+	// immutable
 	private final YelpDB yelpDB;
-	
+
 	private ServerSocket serverSocket;
 	public static final int YELPDB_PORT = 4949;
 
 	private final String userFile = "data/users.json";
 	private final String restaurantFile = "data/restaurants.json";
 	private final String reviewFile = "data/reviews.json";
-	
-	private final List<String> commands; //maybe should be static?
 
-	private static final int GETRESTAURANT = 0;
-	private static final int ADDUSER = 1;
-	private static final int ADDRESTAURANT = 2;
-	private static final int ADDREVIEW = 3;
 	/**
 	 * Make a YelpDBServer that listens for connections on port.
 	 * 
@@ -62,16 +58,6 @@ public class YelpDBServer {
 	public YelpDBServer(int port) throws ParseException, IOException {
 		yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
 		serverSocket = new ServerSocket(port);
-		commands = setupCommands();
-	}
-	
-	private List<String> setupCommands(){
-		List<String> commands = new ArrayList<String>();
-		commands.add("GETRESTAURANT");
-		commands.add("ADDUSER");
-		commands.add("ADDRESTAURANT");
-		commands.add("ADDREVIEW");
-		return Collections.unmodifiableList(commands);
 	}
 
 	/**
@@ -82,9 +68,9 @@ public class YelpDBServer {
 	 */
 	public void serve() throws IOException {
 		while (true) {
-			//block until a client conects
+			// block until a client conects
 			final Socket socket = serverSocket.accept();
-			//create a new thread to handle that client
+			// create a new thread to handle that client
 			Thread handler = new Thread(new Runnable() {
 				public void run() {
 					try {
@@ -95,9 +81,11 @@ public class YelpDBServer {
 						}
 					} catch (IOException ioe) {
 						// this exception wouldn't terminate serve()
-						// since we're now on a different thread but 
+						// since we're now on a different thread but
 						// we still need to handle it
 						ioe.printStackTrace();
+					} catch (ParseException pe) {
+						System.out.println("Parse Exception Happened");
 					}
 				}
 			});
@@ -105,7 +93,7 @@ public class YelpDBServer {
 			handler.start();
 		}
 	}
-	
+
 	/**
 	 * Handle one client connection. Returns when client disconnects.
 	 * 
@@ -113,41 +101,54 @@ public class YelpDBServer {
 	 *            socket where client is connected
 	 * @throws IOException
 	 *             if connection encounters an error
+	 * @throws ParseException 
 	 */
-	private void handle(Socket socket) throws IOException {
+	private void handle(Socket socket) throws IOException, ParseException {
 		System.err.println("New client connected!");
-		
-		// get the socket's input stream, and wrap converters around it 
+
+		// get the socket's input stream, and wrap converters around it
 		// that convert it from a byte stream to a character stream,
 		// and then buffer it so that we can read it line by line
 		BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		
-		// similarly, wrap character=>bytestream converter around the socket output stream
-		// and wrap a PrintWRiter around that so 
+
+		// similarly, wrap character=>bytestream converter around the socket output
+		// stream
+		// and wrap a PrintWRiter around that so
 		// that we have more convenient ways to write Java primitive
 		// types to it
-		PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()),true);
-		
+		PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
+
 		try {
-			//each request is a single line containing a command keyword and its parameters
+			// each request is a single line containing a command keyword and its parameters
 			for (String line = in.readLine(); line != null; line = in.readLine()) {
 				System.err.println("request: " + line);
 				try {
-				
+
 					// get answer and send back to client
 					String reply = prepareReply(line);
 					System.err.println("reply: " + reply);
 					out.println(reply);
-				} /*catch (NoRestaurantException e) {
-					// complain about the error in format of request
-					System.err.println("reply: ERR: NO_RESTAURANT_WITH_GIVEN_ID");
-					out.println("ERR: NO_RESTAURANT_WITH_GIVEN_ID\n");	
-				} */
-				catch (Exception e) {
+				} catch (InvalidUserStringException iuse) {
 					// complain about error in format of request
-					System.err.println("reply: err");
-					out.println("err\n");	
-				} 
+					System.err.println("reply: ERR: INVALID_USER_STRING");
+					out.println("ERR: INVALID_USER_STRING\n");
+				} catch (InvalidRestaurantStringException irese) {
+					// complain about error in format of request
+					System.err.println("reply: ERR: INVALID_RESTAURANT_STRING");
+					out.println("ERR: INVALID_RESTAURANT_STRING\n");
+				} catch (InvalidReviewStringException irvwuse) {
+					// complain about error in format of request
+					System.err.println("reply: ERR: INVALID_REVIEW_STRING");
+					out.println("ERR: INVALID_REVIEW_STRING\n");
+				} catch (NoSuchUserException nsue) {
+					// complain about error in format of request
+					System.err.println("reply: ERR: NO_SUCH_USER");
+					out.println("ERR: NO_SUCH_USER\n");
+				} catch (NoSuchRestaurantException nsre) {
+					// complain about error in format of request
+					System.err.println("reply: ERR: NO_SUCH_RESTAURANT");
+					out.println("ERR: NO_SUCH_RESTAURANT\n");
+				}
 				// important! our PrintWriter is auto-flushing, but if not
 				// out.flush();
 			}
@@ -156,54 +157,51 @@ public class YelpDBServer {
 			in.close();
 		}
 	}
+
+	private String prepareReply(String inputLine) throws ParseException, NoSuchRestaurantException, InvalidUserStringException, InvalidRestaurantStringException, InvalidReviewStringException, NoSuchUserException {
 	
-	private String prepareReply(String inputLine) {
+		String command = getCommand(inputLine);
+		String data = getData(inputLine);
+		if (command.equals("GETRESTAURANT")) {
+			Restaurant r = yelpDB.getRestaurants().get(data);
+			if (r == null)
+				throw new NoSuchRestaurantException();
+			return r.toString();
+		}
 		
-		if (inputLine.equals("GETRESTAURANT")) {
-			return getRestaurant(inputLine).toString();
+		if (command.equals("ADDUSER")) {
+			return yelpDB.addUser(data);
 		}
 		
-		if (inputLine.equals("ADDUSER")) {
-			
+		if (command.equals("ADDRESTAURANT")) {
+			return yelpDB.addRestaurant(data);
 		}
-		if (inputLine.equals("ADDRESTAURANT")) {
-	
+		
+		if (command.equals("ADDREVIEW")) {
+			return yelpDB.addReview(data);
 		}
-		if (inputLine.equals("ADDREVIEW")) {
-	
-		}
+		
 		return null;
 		
 		
 	}
 	
-	private synchronized Restaurant getRestaurant(String businessId) {
-		Map<String, Restaurant> allRestaurants = yelpDB.getRestaurants();
-		return allRestaurants.get(businessId);
+	private boolean isCorrectFormat(String input) {
+		return true;
 	}
-	
-	private synchronized void addReview(Review review) {
-		
-	}
-	
-	private synchronized void addRestaurant(Restaurant restaurant) {
-		
-	}
-	
-	private synchronized void addUser(String userName) {
-		yelpDB.addUser(userName);
-	}
-	
-	private String convertToJsonFormat(Restaurant r) {
 
-		JSONObject obj = new JSONObject();
-		obj.put("x", r.getLatitude());
-		obj.put("y", r.getLongitude());
-		obj.put("name", r.getName());
-	
-		return obj.toJSONString();
+	private String getCommand(String inputLine) {
+		int spaceIndex = inputLine.indexOf(" ");
+		return inputLine.substring(0, spaceIndex);
 	}
+
+	private String getData(String inputLine) {
+		int spaceIndex = inputLine.indexOf(" ");
+		return inputLine.substring(spaceIndex + 1);
+	}
+
 	
+
 	/**
 	 * Start a YelpDBServer running on the default port.
 	 */
@@ -217,6 +215,5 @@ public class YelpDBServer {
 			e.printStackTrace();
 		}
 	}
-	
-	
+
 }

@@ -594,34 +594,50 @@ public class YelpDB implements MP5Db<Restaurant> {
 	 *            represents a user_id in the database
 	 * @param newRating
 	 *            the new rating being submitted 1 <= newRating <= 5
+	 * @throws ParseException 
+	 * 				should never happen unless something goes very wrong...
 	 */
 	// This is supposed to be a private method that would be called by the addReview
 	// method, however, because for testing purposes, and since addReviews would not
 	// be completed in time for the first deadline it was changed to public.
-	private synchronized void updateRatingsAndRatingsCount(String business_id, String user_id, long newRating) {
+	private synchronized void updateRatingsAndRatingsCount(String business_id, String user_id, long newRating) throws ParseException {
 		restaurants.get(business_id).updateRating(newRating);
-		users.get(user_id).updateRating(newRating);
+		users.get(user_id).updateRating(newRating);	
 	} //must be done to ensure no bad interleavings!
 
-	public synchronized String addRestaurant(String restaurantJsonObj) throws ParseException {
-		JSONParser parser = new JSONParser();
-		JSONObject json = (JSONObject) parser.parse(restaurantJsonObj);
-		Restaurant r = new Restaurant(json);
-		restaurants.put(r.getBusiness_id(), r);
-		restaurantToReview.put(r.getBusiness_id(), new HashSet<String>());
-		return r.toString();
+	public synchronized String addRestaurant(String restaurantJsonString) throws InvalidRestaurantStringException {
+		try {
+			Restaurant r = new Restaurant(createJsonObj(restaurantJsonString));
+			restaurants.put(r.getBusiness_id(), r);
+			restaurantToReview.put(r.getBusiness_id(), new HashSet<String>());
+			return r.toString();
+		} catch (ParseException e) {
+			throw new InvalidRestaurantStringException();
+		}
+		
 	}
 	
-	public synchronized String addReview(String reviewJsonObj) throws ParseException {
-		JSONParser parser = new JSONParser();
-		JSONObject json = (JSONObject) parser.parse(reviewJsonObj);
-		Review r = new Review(json);
-		reviews.put(r.toString(), r);
-		userToReview.get(r.getUser_id()).add(r.getReview_id());
-		userToRestaurant.get(r.getUser_id()).add(r.getBusiness_id());
-		restaurantToReview.get(r.getBusiness_id()).add(r.getReview_id());
-		updateRatingsAndRatingsCount(r.getBusiness_id(),r.getUser_id(),r.getStars());
-		return r.toString();
+	public synchronized String addReview(String reviewJsonString) throws InvalidReviewStringException, NoSuchUserException, NoSuchRestaurantException {
+		try {
+			Review r = new Review(createJsonObj(reviewJsonString));
+			if (!users.containsKey(r.getUser_id()))
+				throw new NoSuchUserException();
+			if (!restaurants.containsKey(r.getBusiness_id()))
+				throw new NoSuchRestaurantException();
+			reviews.put(r.toString(), r);
+			userToReview.get(r.getUser_id()).add(r.getReview_id());
+			userToRestaurant.get(r.getUser_id()).add(r.getBusiness_id());
+			restaurantToReview.get(r.getBusiness_id()).add(r.getReview_id());
+			updateRatingsAndRatingsCount(r.getBusiness_id(),r.getUser_id(),r.getStars());
+			return r.toString();
+		} catch (ParseException e) {
+			throw new InvalidReviewStringException(); //note may need to check that the updateRatings function is not causing this exception to be thrown
+		} catch (NoSuchUserException nsue) {
+			throw new NoSuchUserException();
+		} catch (NoSuchRestaurantException nsre) {
+			throw new NoSuchRestaurantException();
+		}
+		
 	}
 	/**
 	 * Creates/ initializes a new user and adds them to the database
@@ -629,12 +645,25 @@ public class YelpDB implements MP5Db<Restaurant> {
 	 * @param name
 	 *            name of the new user/member is not null
 	 * @return Json string representation of the new user's profile in the database
+	 * @throws InvalidUserStringException 
 	 */
-	public synchronized String addUser(String name) {
-		User u = new User(name);
-		users.put(u.getUser_id(), u);
-		userToReview.put(u.getUser_id(), new HashSet<String>());
-		userToRestaurant.put(u.getUser_id(), new HashSet<String>());
-		return u.toString();
+	public synchronized String addUser(String userJsonString) throws InvalidUserStringException {
+		try {
+			String name = ((String)createJsonObj(userJsonString).get("name"));
+			User u = new User(name);
+			users.put(u.getUser_id(), u);
+			userToReview.put(u.getUser_id(), new HashSet<String>());
+			userToRestaurant.put(u.getUser_id(), new HashSet<String>());
+			return u.toString();
+		} catch (ParseException e) {
+			throw new InvalidUserStringException();
+		}
+	}
+	
+	private synchronized JSONObject createJsonObj(String jsonString) throws ParseException {
+		JSONParser parser = new JSONParser();
+		Object obj;
+		obj = parser.parse(jsonString);
+		return (JSONObject)obj;
 	}
 }

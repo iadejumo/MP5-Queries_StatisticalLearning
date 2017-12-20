@@ -104,7 +104,7 @@ public class GeneralDatabaseTest {
 
 		assertFalse(found1);
 
-		yelpDB.addUser(userName);
+		//yelpDB.addUser(userName);
 
 		Map<String, User> usersAfter = yelpDB.getUsers();
 		boolean found2 = false;
