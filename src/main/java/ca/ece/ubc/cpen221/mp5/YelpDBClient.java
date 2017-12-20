@@ -50,20 +50,56 @@ public class YelpDBClient {
 	 public static void main(String[] args) throws InterruptedException {
 	        try {
 	            YelpDBClient client = new YelpDBClient("localhost", YelpDBServer.YELPDB_PORT);
-
+	          
+	            /*client.sendRequest("");
+	            System.out.println("Asked-1: ");
+	            TimeUnit.SECONDS.sleep(1);
+          
+	            System.out.println("Answer1: "+client.getReply());
+	            TimeUnit.SECONDS.sleep(1);
+	            
+	            client.sendRequest("");
+	            System.out.println("Asked0: ");
+	            TimeUnit.SECONDS.sleep(1);
+          
+	            System.out.println("Answer0: "+client.getReply());
+	            TimeUnit.SECONDS.sleep(1);
+	            */
 	            client.sendRequest("GETRESTAURANT gclB3ED6uk6viWlolSb_uA");
 	            System.out.println("Asked1: GETRESTAURANT gclB3ED6uk6viWlolSb_uA");
 	            TimeUnit.SECONDS.sleep(1);
-	            
-	            
-	            
+          
 	            System.out.println("Answer1: "+client.getReply());
+	            TimeUnit.SECONDS.sleep(1);
 	            
-	            client.sendRequest("GETRESTAURANT 1CBs84C-a-cuA3vncXVSAw");
-	            System.out.println("Asked2: GETRESTAURANT 1CBs84C-a-cuA3vncXVSAw");
+	            client.sendRequest("ADDUSER {\"name\": \"Sathish G.\"}");
+	            System.out.println("Asked2: ADDUSER {\"name\": \"Sathish G.\"}");
 	            TimeUnit.SECONDS.sleep(1);
 	            
 	            System.out.println("Answer2: "+client.getReply());
+	            TimeUnit.SECONDS.sleep(1);
+	            
+	            client.sendRequest("ADDUSER {\"name\": \"Tyler L.\"}");
+	            System.out.println("Asked3: ADDUSER {\"name\": \"Tyler L.\"}");
+	            TimeUnit.SECONDS.sleep(1);
+	            
+	            System.out.println("Answer3: "+client.getReply());
+	            TimeUnit.SECONDS.sleep(1);
+	            
+	            client.sendRequest("ADDUSER {\"name\": Tyler L.\"}");
+	            System.out.println("Asked4: ADDUSER {\"name\": Tyler L.\"}, should be error");
+	            TimeUnit.SECONDS.sleep(1);
+	            
+	            System.out.println("Answer4: "+client.getReply());
+	  
+	            client.sendRequest("ADDREVIEW {\"name\": Tyler L.\"}");
+	            System.out.println("Asked5: ADDREVIEW {\"name\": Tyler L.\"}, should be error");
+	            TimeUnit.SECONDS.sleep(1);
+	            
+	            System.out.println("Answer5: "+client.getReply());
+	            
+	            System.out.println("Answer6: "+client.getReply());
+	            System.out.println("Answer7: "+client.getReply());
 	  
 	            client.close();
 	        } catch (IOException ioe) {

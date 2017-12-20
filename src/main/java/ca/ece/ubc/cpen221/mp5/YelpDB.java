@@ -610,7 +610,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 			Restaurant r = new Restaurant(createJsonObj(restaurantJsonString));
 			restaurants.put(r.getBusiness_id(), r);
 			restaurantToReview.put(r.getBusiness_id(), new HashSet<String>());
-			System.out.println(r.toString());
+			System.out.println("New Restaurant: "+r.toString());
 			return r.toString();
 		} catch (ParseException e) {
 			throw new InvalidRestaurantStringException();
@@ -621,22 +621,28 @@ public class YelpDB implements MP5Db<Restaurant> {
 	public synchronized String addReview(String reviewJsonString) throws InvalidReviewStringException, NoSuchUserException, NoSuchRestaurantException {
 		try {
 			Review r = new Review(createJsonObj(reviewJsonString));
+			System.out.println("4");
 			if (!users.containsKey(r.getUser_id()))
 				throw new NoSuchUserException();
+			System.out.println("5");
 			if (!restaurants.containsKey(r.getBusiness_id()))
 				throw new NoSuchRestaurantException();
+			System.out.println("6");
 			reviews.put(r.toString(), r);
 			userToReview.get(r.getUser_id()).add(r.getReview_id());
 			userToRestaurant.get(r.getUser_id()).add(r.getBusiness_id());
 			restaurantToReview.get(r.getBusiness_id()).add(r.getReview_id());
 			updateRatingsAndRatingsCount(r.getBusiness_id(),r.getUser_id(),r.getStars());
-			System.out.println(r.toString());
+			System.out.println("New Review: " + r.toString());
 			return r.toString();
 		} catch (ParseException e) {
+			System.out.println("1");
 			throw new InvalidReviewStringException(); //note may need to check that the updateRatings function is not causing this exception to be thrown
 		} catch (NoSuchUserException nsue) {
+			System.out.println("2");
 			throw new NoSuchUserException();
 		} catch (NoSuchRestaurantException nsre) {
+			System.out.println("3");
 			throw new NoSuchRestaurantException();
 		}
 		
@@ -656,7 +662,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 			users.put(u.getUser_id(), u);
 			userToReview.put(u.getUser_id(), new HashSet<String>());
 			userToRestaurant.put(u.getUser_id(), new HashSet<String>());
-			System.out.println(u.toString());
+			System.out.println("New User: "+ u.toString());
 			return u.toString();
 		} catch (ParseException e) {
 			throw new InvalidUserStringException();

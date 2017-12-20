@@ -4,9 +4,9 @@ public class InvalidUserStringException extends Exception {
 
 	// RI = None
 	// AF = None, no fields
-
+/*
 	public InvalidUserStringException() {
 		System.err.println("ERR: INVALID_USER_INPUT");
-	}
+	} */
 
 }

@@ -39,11 +39,16 @@ public class YelpDBServer {
 	private final YelpDB yelpDB;
 
 	private ServerSocket serverSocket;
-	public static final int YELPDB_PORT = 4946;
+	public static final int YELPDB_PORT = 4948;
 
 	private final String userFile = "data/users.json";
 	private final String restaurantFile = "data/restaurants.json";
 	private final String reviewFile = "data/reviews.json";
+	
+	public static final String GETRESTAURANT = "GETRESTAURANT";
+	public static final String ADDUSER = "ADDUSER";
+	public static final String ADDRESTAURANT = "ADDRESTAURANT";
+	public static final String ADDREVIEW = "ADDREVIEW";
 
 	/**
 	 * Make a YelpDBServer that listens for connections on port.
@@ -85,7 +90,7 @@ public class YelpDBServer {
 						// we still need to handle it
 						ioe.printStackTrace();
 					} catch (ParseException pe) {
-						System.out.println("Parse Exception Happened");
+						pe.printStackTrace();
 					}
 				}
 			});
@@ -121,37 +126,43 @@ public class YelpDBServer {
 		try {
 			// each request is a single line containing a command keyword and its parameters
 			for (String line = in.readLine(); line != null; line = in.readLine()) {
-				System.err.println("request: " + line);
-				try {
-
-					// get answer and send back to client
-					String reply = prepareReply(line);
-					assert(reply != null);
-					System.err.println("reply: " + reply);
-					out.println(reply);
-				} /*catch (InvalidUserStringException iuse) {
-					// complain about error in format of request
-					System.err.println("reply: ERR: INVALID_USER_STRING");
-					out.println("ERR: INVALID_USER_STRING\n");
-				} catch (InvalidRestaurantStringException irese) {
-					// complain about error in format of request
-					System.err.println("reply: ERR: INVALID_RESTAURANT_STRING");
-					out.println("ERR: INVALID_RESTAURANT_STRING\n");
-				} catch (InvalidReviewStringException irvwuse) {
-					// complain about error in format of request
-					System.err.println("reply: ERR: INVALID_REVIEW_STRING");
-					out.println("ERR: INVALID_REVIEW_STRING\n");
-				} catch (NoSuchUserException nsue) {
-					// complain about error in format of request
-					System.err.println("reply: ERR: NO_SUCH_USER");
-					out.println("ERR: NO_SUCH_USER\n");
-				} */catch (NoSuchRestaurantException nsre) {
-					// complain about error in format of request
-					System.err.println("reply: ERR: NO_SUCH_RESTAURANT");
-					out.println("ERR: NO_SUCH_RESTAURANT\n");
+				if (line.equals("")) 
+					System.err.println("Blank input");
+				else {
+					System.err.println("request: " + line);
+					try {
+						// get answer and send back to client
+						String reply = prepareReply(line);
+						System.err.println("reply: " + reply);
+						out.println(reply);
+					} catch (InvalidUserStringException iuse) {
+						// complain about error in format of request
+						System.err.println("reply: ERR: INVALID_USER_STRING");
+						out.println("ERR: INVALID_USER_STRING\n");
+					} catch (InvalidRestaurantStringException irese) {
+						// complain about error in format of request
+						System.err.println("reply: ERR: INVALID_RESTAURANT_STRING");
+						out.println("ERR: INVALID_RESTAURANT_STRING\n");
+					} catch (InvalidReviewStringException irvwuse) {
+						// complain about error in format of request
+						System.err.println("reply: ERR: INVALID_REVIEW_STRING");
+						out.println("ERR: INVALID_REVIEW_STRING\n");
+					} catch (NoSuchUserException nsue) {
+						// complain about error in format of request
+						System.err.println("reply: ERR: NO_SUCH_USER");
+						out.println("ERR: NO_SUCH_USER\n");
+					} catch (NoSuchRestaurantException nsre) {
+						// complain about error in format of request
+						System.err.println("reply: ERR: NO_SUCH_RESTAURANT");
+						out.println("ERR: NO_SUCH_RESTAURANT\n");
+					} catch (InvalidCommandException ice) {
+						// complain about error in format of request
+						System.err.println("reply: ERR: INVALID_COMMAND");
+						out.println("ERR: INVALID_COMMAND\n");
+					}
+					// important! our PrintWriter is auto-flushing, but if not
+					// out.flush();
 				}
-				// important! our PrintWriter is auto-flushing, but if not
-				// out.flush();
 			}
 		} finally {
 			out.close();
@@ -159,45 +170,48 @@ public class YelpDBServer {
 		}
 	}
 
-	private String prepareReply(String inputLine) throws ParseException, NoSuchRestaurantException {
+	private String prepareReply(String inputLine) throws ParseException, NoSuchRestaurantException, InvalidUserStringException, InvalidReviewStringException, NoSuchUserException, InvalidRestaurantStringException, InvalidCommandException {
 	
 		String command = getCommand(inputLine);
 		String data = getData(inputLine);
-		
-		if (command.equals("GETRESTAURANT")) {
+		System.err.println("Command: " + command);
+		System.err.println("Data: " + data);
+		if (inputLine.startsWith(GETRESTAURANT)) {
 			Restaurant r = yelpDB.getRestaurants().get(data);
 			if (r == null)
 				throw new NoSuchRestaurantException();
 			return r.toString();
 		}
-		/*
-		if (command.equals("ADDUSER")) {
+		
+		else if (inputLine.startsWith(ADDUSER)) {
 			return yelpDB.addUser(data);
 		}
 		
-		if (command.equals("ADDRESTAURANT")) {
+		else if (command.startsWith(ADDRESTAURANT)) {
 			return yelpDB.addRestaurant(data);
 		}
 		
-		if (command.equals("ADDREVIEW")) {
+		else if (command.startsWith(ADDREVIEW)) {
 			return yelpDB.addReview(data);
 		}
-*/
-		System.out.println("INVALID COMMAND LINE");
-		return null;
+		else if (command.equals(""))
+			return "BLANK INPUT, SO NO OUTPUT";
+		else
+			throw new InvalidCommandException();
 	}
 	
-	private boolean isCorrectFormat(String input) {
-		return true;
-	}
 
 	private String getCommand(String inputLine) {
 		int spaceIndex = inputLine.indexOf(" ");
+		if (spaceIndex==-1)
+			return "";
 		return inputLine.substring(0, spaceIndex);
 	}
 
 	private String getData(String inputLine) {
 		int spaceIndex = inputLine.indexOf(" ");
+		if (spaceIndex==-1)
+			return "";
 		return inputLine.substring(spaceIndex + 1);
 	}
 
@@ -216,5 +230,7 @@ public class YelpDBServer {
 			e.printStackTrace();
 		}
 	}
+	
+	
 
 }
