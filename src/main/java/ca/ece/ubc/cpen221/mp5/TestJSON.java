@@ -28,10 +28,16 @@ public class TestJSON {
 		double predicted = predictor.applyAsDouble(yelpDB, "P2XKcDLVHUuOdGNBQtMFRQ");
 		
 		String s1 = "in(Telegraph Ave) && (category(Chinese) || category(Italian)) && price <= 2";
-		String s = "category(i)";
-		String s2 = "time";
+		String s = "in(Telegraph Ave)";
+		String s2 = "price <= 2";
+		String s3 = "price <= 2 && in(Telegraph Ave)";
+		String s4 = "category(Chinese) || category(Italian)";
 		
+		yelpDB.parseInput(s);
+		yelpDB.parseInput(s2);
+		yelpDB.parseInput(s3);
 		yelpDB.parseInput(s1);
+		
 		//System.out.println(predicted);
 		
 		

@@ -295,8 +295,13 @@ public class YelpDB implements MP5Db<Restaurant> {
 		System.err.println(tree.toStringTree(parser));
 		// ((RuleContext) tree).inspect((Parser)parser);
 		ParseTreeWalker walker = new ParseTreeWalker();
+		
+		
 		QueryGrammarListener listener = new ExpressionEvalution(this);
+		
 		walker.walk(listener, tree);
+		
+		System.out.println(((ExpressionEvalution) listener).returnResults().size());
 		
 	}
 
