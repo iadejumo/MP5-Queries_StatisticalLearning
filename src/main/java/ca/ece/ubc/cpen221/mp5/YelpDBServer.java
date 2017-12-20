@@ -39,7 +39,7 @@ public class YelpDBServer {
 	private final YelpDB yelpDB;
 
 	private ServerSocket serverSocket;
-	public static final int YELPDB_PORT = 4949;
+	public static final int YELPDB_PORT = 4946;
 
 	private final String userFile = "data/users.json";
 	private final String restaurantFile = "data/restaurants.json";
@@ -113,7 +113,7 @@ public class YelpDBServer {
 
 		// similarly, wrap character=>bytestream converter around the socket output
 		// stream
-		// and wrap a PrintWRiter around that so
+		// and wrap a PrintWriter around that so
 		// that we have more convenient ways to write Java primitive
 		// types to it
 		PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
@@ -126,9 +126,10 @@ public class YelpDBServer {
 
 					// get answer and send back to client
 					String reply = prepareReply(line);
+					assert(reply != null);
 					System.err.println("reply: " + reply);
 					out.println(reply);
-				} catch (InvalidUserStringException iuse) {
+				} /*catch (InvalidUserStringException iuse) {
 					// complain about error in format of request
 					System.err.println("reply: ERR: INVALID_USER_STRING");
 					out.println("ERR: INVALID_USER_STRING\n");
@@ -144,7 +145,7 @@ public class YelpDBServer {
 					// complain about error in format of request
 					System.err.println("reply: ERR: NO_SUCH_USER");
 					out.println("ERR: NO_SUCH_USER\n");
-				} catch (NoSuchRestaurantException nsre) {
+				} */catch (NoSuchRestaurantException nsre) {
 					// complain about error in format of request
 					System.err.println("reply: ERR: NO_SUCH_RESTAURANT");
 					out.println("ERR: NO_SUCH_RESTAURANT\n");
@@ -158,17 +159,18 @@ public class YelpDBServer {
 		}
 	}
 
-	private String prepareReply(String inputLine) throws ParseException, NoSuchRestaurantException, InvalidUserStringException, InvalidRestaurantStringException, InvalidReviewStringException, NoSuchUserException {
+	private String prepareReply(String inputLine) throws ParseException, NoSuchRestaurantException {
 	
 		String command = getCommand(inputLine);
 		String data = getData(inputLine);
+		
 		if (command.equals("GETRESTAURANT")) {
 			Restaurant r = yelpDB.getRestaurants().get(data);
 			if (r == null)
 				throw new NoSuchRestaurantException();
 			return r.toString();
 		}
-		
+		/*
 		if (command.equals("ADDUSER")) {
 			return yelpDB.addUser(data);
 		}
@@ -180,10 +182,9 @@ public class YelpDBServer {
 		if (command.equals("ADDREVIEW")) {
 			return yelpDB.addReview(data);
 		}
-		
+*/
+		System.out.println("INVALID COMMAND LINE");
 		return null;
-		
-		
 	}
 	
 	private boolean isCorrectFormat(String input) {

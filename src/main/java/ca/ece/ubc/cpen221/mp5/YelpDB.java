@@ -610,6 +610,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 			Restaurant r = new Restaurant(createJsonObj(restaurantJsonString));
 			restaurants.put(r.getBusiness_id(), r);
 			restaurantToReview.put(r.getBusiness_id(), new HashSet<String>());
+			System.out.println(r.toString());
 			return r.toString();
 		} catch (ParseException e) {
 			throw new InvalidRestaurantStringException();
@@ -629,6 +630,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 			userToRestaurant.get(r.getUser_id()).add(r.getBusiness_id());
 			restaurantToReview.get(r.getBusiness_id()).add(r.getReview_id());
 			updateRatingsAndRatingsCount(r.getBusiness_id(),r.getUser_id(),r.getStars());
+			System.out.println(r.toString());
 			return r.toString();
 		} catch (ParseException e) {
 			throw new InvalidReviewStringException(); //note may need to check that the updateRatings function is not causing this exception to be thrown
@@ -654,6 +656,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 			users.put(u.getUser_id(), u);
 			userToReview.put(u.getUser_id(), new HashSet<String>());
 			userToRestaurant.put(u.getUser_id(), new HashSet<String>());
+			System.out.println(u.toString());
 			return u.toString();
 		} catch (ParseException e) {
 			throw new InvalidUserStringException();

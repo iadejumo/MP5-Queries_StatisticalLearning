@@ -10,8 +10,6 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
 
-import fibonacci.FibonacciClient;
-import fibonacci.FibonacciServer;
 
 public class YelpDBClient {
 
@@ -25,18 +23,18 @@ public class YelpDBClient {
 		out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
 	}
 	
-	public void sendRequest(int x) {
-		out.println(x + "\n");
+	public void sendRequest(String s) {
+		out.println(s + "\n");
 		out.flush();
 	}
 	
-	public BigInteger getReply() throws IOException {
+	public String getReply() throws IOException {
 		String reply = in.readLine();
 		if (reply == null)
 			throw new IOException("connection ended");
 		
 		try {
-			return new BigInteger(reply);
+			return reply;
 			
 		} catch (Exception e) {
 			throw new IOException("misformatted reply");
@@ -53,24 +51,20 @@ public class YelpDBClient {
 	        try {
 	            YelpDBClient client = new YelpDBClient("localhost", YelpDBServer.YELPDB_PORT);
 
-	            // send the requests to find the first N Fibonacci numbers
-	            int p = -2;
-	            client.sendRequest(p);
-	            System.out.println(client.getReply());
-	            
-	            for (int x = 1; x <= N; ++x) {
-	                client.sendRequest(x);
-	                System.out.println("fibonacci("+x+") = ?");
-	                TimeUnit.SECONDS.sleep(1);
-	            }
+	            client.sendRequest("GETRESTAURANT gclB3ED6uk6viWlolSb_uA");
+	            System.out.println("Asked1: GETRESTAURANT gclB3ED6uk6viWlolSb_uA");
+	            TimeUnit.SECONDS.sleep(1);
 	            
 	            
-	            // collect the replies
-	            for (int x = 1; x <= N; ++x) {
-	                BigInteger y = client.getReply();
-	                System.out.println("fibonacci("+x+") = "+y);
-	            }
 	            
+	            System.out.println("Answer1: "+client.getReply());
+	            
+	            client.sendRequest("GETRESTAURANT 1CBs84C-a-cuA3vncXVSAw");
+	            System.out.println("Asked2: GETRESTAURANT 1CBs84C-a-cuA3vncXVSAw");
+	            TimeUnit.SECONDS.sleep(1);
+	            
+	            System.out.println("Answer2: "+client.getReply());
+	  
 	            client.close();
 	        } catch (IOException ioe) {
 	            ioe.printStackTrace();
