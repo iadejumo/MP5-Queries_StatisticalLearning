@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.apache.commons.lang3.StringUtils;
 
 public class ExpressionEvalution extends QueryGrammarBaseListener {
 	private Map<String, Restaurant> restaurants;
@@ -61,7 +62,7 @@ public class ExpressionEvalution extends QueryGrammarBaseListener {
 	 * {@inheritDoc}
 	 *
 	 * <p>
-	 * Adds the children of the orExpr to a list and ensures that the list only
+	 * Combines the lists for  children of the orExpr to a list and ensures that the list only
 	 * contains one of each object
 	 * </p>
 	 */
@@ -73,12 +74,14 @@ public class ExpressionEvalution extends QueryGrammarBaseListener {
 		orCombination = matches.pop();
 
 		if (ctx.OR().toString().contains("||")) {
-			System.out.println("Inside");
-			otherList = matches.pop();
-
-			for (String item : otherList) {
-				if (!orCombination.contains(item)) {
-					orCombination.add(item);
+			int numOfExpr = StringUtils.countMatches(ctx.OR().toString(), "||");
+			for (int expr = 0; expr < numOfExpr; expr++) {
+				otherList = matches.pop();
+	
+				for (String item : otherList) {
+					if (!orCombination.contains(item)) {
+						orCombination.add(item);
+					}
 				}
 			}
 		}
@@ -113,10 +116,13 @@ public class ExpressionEvalution extends QueryGrammarBaseListener {
 		list1 = matches.pop();
 
 		if (ctx.AND().toString().contains("&&")) {
-			list2 = matches.pop();
-			for (String item : list1) {
-				if (list2.contains(item)) {
-					andCombination.add(item);
+			int numOfExpr = StringUtils.countMatches(ctx.AND().toString(), "&&");
+			for (int expr = 0; expr < numOfExpr; expr++) {
+				list2 = matches.pop();
+				for (String item : list1) {
+					if (list2.contains(item)) {
+						andCombination.add(item);
+					}
 				}
 			}
 		} else {
