@@ -1,12 +1,5 @@
 package ca.ece.ubc.cpen221.mp5;
 
 public class NoSuchRestaurantException extends Exception {
-
-	// RI = None
-	// AF = None, no fields
-/*
-	public NoSuchRestaurantException() {
-		System.err.println("ERR: NO_RESTAURANT_WITH_GIVEN_ID");
-	} */
-
+	//No RI or AF b/c no fields, simply a label for a type of Exception
 }

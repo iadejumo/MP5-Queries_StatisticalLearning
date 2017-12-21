@@ -44,10 +44,16 @@ __Least Squares Regression__
 Work Division: As of December 20 
 ===
 ####Part 3: A YelpDB Server
-To be completed
-####Part 4: Handling Simple Requests
-To be completed
-####Part 5: Structured Queries
-To be completed
++ Tyler: 2 hours
 
-===
+####Part 4: Handling Simple Requests
++ Tyler: 15.5 hours
+
+####Part 5: Structured Queries
++ Isaiah: 18 hours
+
+####December 20 Total
+
++ __Tyler: 20 + 17.5 = 37.5 hours__
++ __Isaiah: 23.5 + 18  = 41.5 hours__
+

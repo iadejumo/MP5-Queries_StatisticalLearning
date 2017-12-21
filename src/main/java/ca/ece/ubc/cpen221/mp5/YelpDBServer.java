@@ -139,7 +139,6 @@ public class YelpDBServer {
 						out.println(reply);
 					} catch (InvalidUserStringException iuse) {
 						// complain about error in format of request
-						System.err.println(iuse.getStackTrace());
 						System.err.println("reply: ERR: INVALID_USER_STRING");
 						out.println("ERR: INVALID_USER_STRING\n");
 					} catch (InvalidRestaurantStringException irese) {
