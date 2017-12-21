@@ -100,16 +100,19 @@ public class QueryTests {
 		assertEquals(1, matches.size());
 		
 	}
-	
-	
+		
 	@Test
 	public void test8() throws ParseException, IOException {
 		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
+		String restuarant1 = yelpDB.getRestaurants().get("TUIDRJ_rUkdmYPSRAAEsPg").getName();
+		System.out.println(restuarant1.equals("I.B.'s Hoagies"));
 		
 		String query = "name(I.B.'s Hoagies) || name(Steve's Bar-B-Que) || name(Pho K & K)";
 		
 		Set<String> matches = yelpDB.getMatches(query);
 		
+
+		System.out.println(matches);
 		assertEquals(3, matches.size());	
 	}
 	
@@ -156,7 +159,7 @@ public class QueryTests {
 	public void test11() throws ParseException, IOException {
 		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
 		
-		String query = "price < 0";
+		String query = "price > 0";
 		
 		Set<String> matches = yelpDB.getMatches(query);		
 	}
@@ -165,7 +168,7 @@ public class QueryTests {
 	public void test12() throws ParseException, IOException {
 		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
 		
-		String query = "rating <= 1";
+		String query = "price <= 1";
 		
 		Set<String> matches = yelpDB.getMatches(query);
 		
@@ -176,11 +179,11 @@ public class QueryTests {
 	public void test13() throws ParseException, IOException {
 		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
 		
-		String query = "rating = 3";
+		String query = "price = 3";
 		
 		Set<String> matches = yelpDB.getMatches(query);
 		
-		assertEquals(30, matches.size());
+		assertEquals(11, matches.size());
 		
 	}
 	
@@ -188,11 +191,11 @@ public class QueryTests {
 	public void test14() throws ParseException, IOException {
 		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
 		
-		String query = "rating >= 4";
+		String query = "price >= 3";
 		
 		Set<String> matches = yelpDB.getMatches(query);
 		
-		assertEquals(39, matches.size());
+		assertEquals(20, matches.size());
 		
 	}
 	
@@ -200,11 +203,11 @@ public class QueryTests {
 	public void test15() throws ParseException, IOException {
 		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
 		
-		String query = "rating > 4";
+		String query = "price > 3";
 		
 		Set<String> matches = yelpDB.getMatches(query);
 		
-		assertEquals(7, matches.size());	
+		assertEquals(9, matches.size());	
 	}
 	
 	@Test (expected = Exception.class)

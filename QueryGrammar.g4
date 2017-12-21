@@ -18,7 +18,7 @@ NUM  : [1-5]+;
 LPAREN  : '(';
 RPAREN  : ')';
 WORD  :  [a-zA-Z0-9]+;
-SYMBOLS  :  ('\''|'/'|'('|')'|'-'|'&'|'.')+;
+SYMBOLS  :  '\''|'/'|'('|')'|'-'|'&'|'.';
 WS  : (' '|'\t'|'\r'|'\n')+;
 
 //Non-terminals: Parser
@@ -35,5 +35,5 @@ rating  : 'rating' WS? INEQ WS? NUM;
 price  : 'price' WS? INEQ WS? NUM; 
 
 //WORD  :  .+;
-string  : (WS? WORD WS?)+ (WS? SYMBOLS? WS? string WS?)*;
+string  : (WS? WORD WS?)+ (WS? SYMBOLS* WS? WORD WS?)*;
 //string  : .+;

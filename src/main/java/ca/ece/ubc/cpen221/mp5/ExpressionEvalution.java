@@ -38,7 +38,7 @@ public class ExpressionEvalution extends QueryGrammarBaseListener {
 	 * {@inheritDoc}
 	 *
 	 * <p>
-	 * The default implementation does nothing.
+	 * Generates the final list of all the matches
 	 * </p>
 	 */
 	@Override
@@ -46,13 +46,6 @@ public class ExpressionEvalution extends QueryGrammarBaseListener {
 		finalMatches.addAll(matches.pop());
 	}
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>
-	 * The default implementation does nothing.
-	 * </p>
-	 */
 	/**
 	 * {@inheritDoc}
 	 *
@@ -68,7 +61,8 @@ public class ExpressionEvalution extends QueryGrammarBaseListener {
 	 * {@inheritDoc}
 	 *
 	 * <p>
-	 * The default implementation does nothing.
+	 * Adds the children of the orExpr to a list and ensures that the list only
+	 * contains one of each object
 	 * </p>
 	 */
 	@Override
@@ -77,7 +71,6 @@ public class ExpressionEvalution extends QueryGrammarBaseListener {
 		List<String> orCombination = new ArrayList<String>();
 
 		orCombination = matches.pop();
-		int numChildren = ctx.getChildCount();
 
 		if (ctx.OR().toString().contains("||")) {
 			System.out.println("Inside");
@@ -179,7 +172,7 @@ public class ExpressionEvalution extends QueryGrammarBaseListener {
 
 		List<String> matchNeighborhood = restaurants.keySet().stream()
 				.filter(x -> restaurants.get(x).getNeighborhoods().contains(neighborhood)).collect(Collectors.toList());
-		// System.out.println(matchNeighborhood);
+
 		matches.push(matchNeighborhood);
 	}
 
@@ -207,7 +200,7 @@ public class ExpressionEvalution extends QueryGrammarBaseListener {
 
 		List<String> matchCategory = restaurants.keySet().stream()
 				.filter(x -> restaurants.get(x).getCategories().contains(category)).collect(Collectors.toList());
-		// System.out.println(matchCategory);
+
 		matches.push(matchCategory);
 	}
 
@@ -235,7 +228,7 @@ public class ExpressionEvalution extends QueryGrammarBaseListener {
 
 		List<String> matchName = restaurants.keySet().stream()
 				.filter(x -> restaurants.get(x).getName().equals(businessName)).collect(Collectors.toList());
-		// System.out.println(matchName);
+
 		matches.push(matchName);
 	}
 
@@ -288,7 +281,6 @@ public class ExpressionEvalution extends QueryGrammarBaseListener {
 					.filter(x -> checkClose(restaurants.get(x).getStars(), rating)).collect(Collectors.toList());
 		}
 
-		// System.out.println(matchRatingAndInequality);
 		matches.push(matchRatingAndInequality);
 	}
 
@@ -333,7 +325,6 @@ public class ExpressionEvalution extends QueryGrammarBaseListener {
 					.collect(Collectors.toList());
 		}
 
-		// System.out.println(matchPriceAndInequality);
 		matches.push(matchPriceAndInequality);
 	}
 

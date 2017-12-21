@@ -71,7 +71,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 	private Map<String, Set<String>> userToReview;
 	private Map<String, Set<String>> restaurantToReview;
 	private Map<String, Set<String>> userToRestaurant;
-	
+
 	/**
 	 * Initializes and constructs the database. And establishes the relationships
 	 * between entries in the database
@@ -272,55 +272,86 @@ public class YelpDB implements MP5Db<Restaurant> {
 		return new HashMap<String, User>(users);
 	}
 
-	// Uncompleted (Part 5)
+	/**
+	 * Perform a structured query and return a Set of JSON String representation of
+	 * the restaurants within the database that match the given query.
+	 * 
+	 * @param queryString
+	 *            string (e.g of the form "in(Telegraph Ave) && (category(Chinese)
+	 *            || category(Italian)) && price <= 2") with matches within the
+	 *            database
+	 * @return a Set of JSON String representation of the restaurants within the
+	 *         database that match the given query.
+	 * @throws RuntimeException
+	 *             no items in the database match the query or if the query is
+	 *             ill-formatted
+	 */
 	@Override
-	public synchronized Set getMatches(String queryString){
-		// TODO Auto-generated method stub
-		
+	public synchronized Set getMatches(String queryString) {
 		return parseInput(queryString);
 	}
 
-	// Uncompleted (Part 5)
-	// TODO Change back to private
-	private Set<String> parseInput(String input){
+	/**
+	 * Takes in the query string, parses it and performs structured query. Returns a
+	 * Set of JSON String representation of the restaurants within the database that
+	 * match the given query.
+	 * 
+	 * @param input
+	 *            string (e.g of the form "in(Telegraph Ave) && (category(Chinese)
+	 *            || category(Italian)) && price <= 2") with matches within the
+	 *            database
+	 * @return a Set of JSON String representation of the restaurants within the
+	 *         database that match the given query.
+	 * @throws RuntimeException
+	 *             no items in the database match the query or if the query is
+	 *             ill-formatted
+	 */
+	private Set<String> parseInput(String input) {
 		CharStream stream = new ANTLRInputStream(input);
 
 		QueryGrammarLexer lexer = new QueryGrammarLexer(stream);
 		lexer.removeErrorListeners();
+		// Adding the modified ErrorListener that throws RuntimeException
 		lexer.addErrorListener(ThrowingErrorListener.INSTANCE);
-		
+
 		TokenStream tokens = new CommonTokenStream(lexer);
 
 		QueryGrammarParser parser = new QueryGrammarParser(tokens);
 		parser.removeErrorListeners();
+		// Adding the modified ErrorListener that throws RuntimeException
 		parser.addErrorListener(ThrowingErrorListener.INSTANCE);
 
 		ParseTree tree = parser.root();
 
-		System.err.println(tree.toStringTree(parser));
-
 		ParseTreeWalker walker = new ParseTreeWalker();
-		
+
 		QueryGrammarListener listener = new ExpressionEvalution(this);
-		
+
 		walker.walk(listener, tree);
-		
+
 		List<String> matches = ((ExpressionEvalution) listener).returnResults();
-		
+
 		if (matches.size() == 0) {
 			throw new NoMatchesException();
 		}
-		
-		System.out.println(((ExpressionEvalution) listener).returnResults().size());
-		
+
 		return mapBusinessToJSONString(matches);
 	}
-	
-	private Set<String> mapBusinessToJSONString (List<String> businessIDMatches){
-		
-		Set<String> setOfMatches = businessIDMatches.stream()
-		.map(x -> restaurants.get(x).toString()).collect(Collectors.toSet());
-		
+
+	/**
+	 * Maps a list of restaurant businessId's to the corresponding restaurant JSON
+	 * String and returns a set of all the JSON Strings
+	 * 
+	 * @param businessIDMatches
+	 *            list containing businessId's of restaurants within the database
+	 * @return a Set of JSON String representation of the restaurants in the list
+	 * 
+	 */
+	private Set<String> mapBusinessToJSONString(List<String> businessIDMatches) {
+
+		Set<String> setOfMatches = businessIDMatches.stream().map(x -> restaurants.get(x).toString())
+				.collect(Collectors.toSet());
+
 		return setOfMatches;
 	}
 
@@ -608,8 +639,8 @@ public class YelpDB implements MP5Db<Restaurant> {
 	 *         If price.size() < 2 then it throw an IllegalArgumentException because
 	 *         the data points are too few.
 	 */
-	private synchronized ToDoubleBiFunction<MP5Db<Restaurant>, String> generatePredictor(List<Long> xList, List<Long> yList,
-			double meanX, double meanY) {
+	private synchronized ToDoubleBiFunction<MP5Db<Restaurant>, String> generatePredictor(List<Long> xList,
+			List<Long> yList, double meanX, double meanY) {
 		int numReviews = xList.size();
 
 		if (numReviews <= 1) {
@@ -649,40 +680,42 @@ public class YelpDB implements MP5Db<Restaurant> {
 	 *            represents a user_id in the database
 	 * @param newRating
 	 *            the new rating being submitted 1 <= newRating <= 5
-	 * @throws ParseException 
-	 * 				should never happen unless something goes very wrong...
+	 * @throws ParseException
+	 *             should never happen unless something goes very wrong...
 	 */
 	// This is supposed to be a private method that would be called by the addReview
 	// method, however, because for testing purposes, and since addReviews would not
 	// be completed in time for the first deadline it was changed to public.
-	private synchronized void updateRatingsAndRatingsCount(String business_id, String user_id, long newRating) throws ParseException {
+	private synchronized void updateRatingsAndRatingsCount(String business_id, String user_id, long newRating)
+			throws ParseException {
 		restaurants.get(business_id).updateRating(newRating);
-		users.get(user_id).updateRating(newRating);	
-	} //must be done to ensure no bad interleavings!
+		users.get(user_id).updateRating(newRating);
+	} // must be done to ensure no bad interleavings!
 
 	public synchronized String addRestaurant(String restaurantJsonString) throws InvalidRestaurantStringException {
 		try {
 			JSONObject jObj = createJsonObj(restaurantJsonString);
-			if (!checkIfRestaurantJson(jObj)) 
+			if (!checkIfRestaurantJson(jObj))
 				throw new Exception();
-			
+
 			Restaurant r = new Restaurant(jObj);
 			restaurants.put(r.getBusiness_id(), r);
 			restaurantToReview.put(r.getBusiness_id(), new HashSet<String>());
-			System.out.println("New Restaurant: "+r.toString());
+			System.out.println("New Restaurant: " + r.toString());
 			return r.toString();
 		} catch (Exception e) {
 			throw new InvalidRestaurantStringException();
 		}
-		
+
 	}
-	
-	public synchronized String addReview(String reviewJsonString) throws InvalidReviewStringException, NoSuchUserException, NoSuchRestaurantException {
+
+	public synchronized String addReview(String reviewJsonString)
+			throws InvalidReviewStringException, NoSuchUserException, NoSuchRestaurantException {
 		try {
 			JSONObject jObj = createJsonObj(reviewJsonString);
-			if (!checkIfReviewJson(jObj)) 
+			if (!checkIfReviewJson(jObj))
 				throw new IOException();
-			
+
 			Review r = new Review(jObj);
 			if (!users.containsKey(r.getUser_id()))
 				throw new NoSuchUserException();
@@ -692,43 +725,47 @@ public class YelpDB implements MP5Db<Restaurant> {
 			userToReview.get(r.getUser_id()).add(r.getReview_id());
 			userToRestaurant.get(r.getUser_id()).add(r.getBusiness_id());
 			restaurantToReview.get(r.getBusiness_id()).add(r.getReview_id());
-			updateRatingsAndRatingsCount(r.getBusiness_id(),r.getUser_id(),r.getStars());
+			updateRatingsAndRatingsCount(r.getBusiness_id(), r.getUser_id(), r.getStars());
 			System.out.println("New Review: " + r.toString());
 			return r.toString();
 		} catch (ParseException e) {
-			throw new InvalidReviewStringException(); //note may need to check that the updateRatings function is not causing this exception to be thrown
+			throw new InvalidReviewStringException(); // note may need to check that the updateRatings function is not
+														// causing this exception to be thrown
 		} catch (IOException e) {
-			throw new InvalidReviewStringException(); //note may need to check that the updateRatings function is not causing this exception to be thrown
-		}catch (NoSuchUserException nsue) {
+			throw new InvalidReviewStringException(); // note may need to check that the updateRatings function is not
+														// causing this exception to be thrown
+		} catch (NoSuchUserException nsue) {
 			throw new NoSuchUserException();
 		} catch (NoSuchRestaurantException nsre) {
 			throw new NoSuchRestaurantException();
 		}
-		
+
 	}
-	
+
 	private static final String userFile = "data/users.json";
 	private static final String restaurantFile = "data/restaurants.json";
 	private static final String reviewFile = "data/reviews.json";
-	
-	public static void main(String[] args) throws ParseException, IOException, InvalidReviewStringException, NoSuchUserException, NoSuchRestaurantException {
+
+	public static void main(String[] args) throws ParseException, IOException, InvalidReviewStringException,
+			NoSuchUserException, NoSuchRestaurantException {
 		YelpDB y = new YelpDB(restaurantFile, reviewFile, userFile);
 		System.out.println(y.addReview("{\"name\": Tyler L.\"}"));
 	}
+
 	/**
 	 * Creates/ initializes a new user and adds them to the database
 	 * 
 	 * @param name
 	 *            name of the new user/member is not null
 	 * @return Json string representation of the new user's profile in the database
-	 * @throws InvalidUserStringException 
+	 * @throws InvalidUserStringException
 	 */
 	public synchronized String addUser(String userJsonString) throws InvalidUserStringException {
 		try {
 			JSONObject jObj = createJsonObj(userJsonString);
-			if (!checkIfUserJson(jObj)) 
+			if (!checkIfUserJson(jObj))
 				throw new Exception();
-			
+
 			String name = ((String) jObj.get("name"));
 			User u = new User(name);
 			users.put(u.getUser_id(), u);
@@ -740,29 +777,35 @@ public class YelpDB implements MP5Db<Restaurant> {
 			throw new InvalidUserStringException();
 		}
 	}
-	
+
 	private boolean checkIfReviewJson(JSONObject jObj) {
-		if (jObj.get("business_id") == null || jObj.get("votes") == null || jObj.get("text") == null || jObj.get("stars") == null || jObj.get("user_id") == null || jObj.get("date") == null )
+		if (jObj.get("business_id") == null || jObj.get("votes") == null || jObj.get("text") == null
+				|| jObj.get("stars") == null || jObj.get("user_id") == null || jObj.get("date") == null)
 			return false;
-		return true;	
+		return true;
 	}
-	
+
 	private boolean checkIfRestaurantJson(JSONObject jObj) {
-		if (jObj.get("open") == null || jObj.get("url") == null || jObj.get("longitude") == null || jObj.get("neighborhoods") == null || jObj.get("name") == null || jObj.get("categories") == null || jObj.get("state") == null|| jObj.get("city") == null || jObj.get("full_address") == null || jObj.get("photo_url") == null || jObj.get("schools") == null || jObj.get("latitude") == null || jObj.get("price") == null)
+		if (jObj.get("open") == null || jObj.get("url") == null || jObj.get("longitude") == null
+				|| jObj.get("neighborhoods") == null || jObj.get("name") == null || jObj.get("categories") == null
+				|| jObj.get("state") == null || jObj.get("city") == null || jObj.get("full_address") == null
+				|| jObj.get("photo_url") == null || jObj.get("schools") == null || jObj.get("latitude") == null
+				|| jObj.get("price") == null)
 			return false;
-		return true;	
+		return true;
 	}
+
 	private boolean checkIfUserJson(JSONObject jObj) {
 		if (jObj.get("name") == null)
 			return false;
 		return true;
 	}
+
 	private synchronized JSONObject createJsonObj(String jsonString) throws ParseException {
 		JSONParser parser = new JSONParser();
 		Object obj;
 		obj = parser.parse(jsonString);
-		return (JSONObject)obj;
+		return (JSONObject) obj;
 	}
-	
-	
+
 }
