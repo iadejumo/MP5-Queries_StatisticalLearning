@@ -10,6 +10,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.junit.Test;
 
+import ca.ece.ubc.cpen221.mp5.InvalidUserStringException;
 import ca.ece.ubc.cpen221.mp5.Restaurant;
 import ca.ece.ubc.cpen221.mp5.Review;
 import ca.ece.ubc.cpen221.mp5.User;
@@ -88,38 +89,6 @@ public class GeneralDatabaseTest {
 	}
 
 	@Test
-	public void test4() throws ParseException, IOException {
-		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
-		Map<String, User> usersInitial = yelpDB.getUsers();
-		User newUser = null;
-		String userName = "Sathish G.";
-
-		boolean found1 = false;
-
-		for (String s : usersInitial.keySet()) {
-			if (usersInitial.get(s).getName().equals(userName)) {
-				found1 = true;
-			}
-		}
-
-		assertFalse(found1);
-
-		//yelpDB.addUser(userName);
-
-		Map<String, User> usersAfter = yelpDB.getUsers();
-		boolean found2 = false;
-
-		for (User u : usersAfter.values()) {
-			if (u.getName().equals(userName)) {
-				found2 = true;
-				newUser = u;
-			}
-		}
-
-		assertTrue(found2);
-	}
-
-	@Test
 	public void test5() throws ParseException, IOException {
 		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
 
@@ -135,24 +104,18 @@ public class GeneralDatabaseTest {
 		User user2 = yelpDB.getUsers().get("dLob_b2vhg4_V95-VMVdLw");
 		User user3 = user1;
 
-		assertFalse(res1.equals(res2));
-		assertTrue(res1.hashCode() != res2.hashCode());
-		assertTrue(res1.equals(res3));
-		assertTrue(res1.hashCode() == res3.hashCode());
+		assertFalse(res1.similar(res2));
+		assertTrue(res1.similar(res3));
 
-		assertFalse(rev1.equals(rev2));
-		assertTrue(rev1.hashCode() != rev2.hashCode());
-		assertTrue(rev1.equals(rev3));
-		assertTrue(rev1.hashCode() == rev3.hashCode());
+		assertFalse(rev1.similar(rev2));
+		assertTrue(rev1.similar(rev3));
 
-		assertFalse(user1.equals(user2));
-		assertTrue(user1.hashCode() != user2.hashCode());
-		assertTrue(user1.equals(user3));
-		assertTrue(user1.hashCode() == user3.hashCode());
+		assertFalse(user1.similar(user2));
+		assertTrue(user1.similar(user3));
 
-		assertFalse(res1.equals(rev1));
-		assertFalse(rev1.equals(user1));
-		assertFalse(user1.equals(res1));
+		assertFalse(res1.similar(rev1));
+		assertFalse(rev1.similar(user1));
+		assertFalse(user1.similar(res1));
 	}
 
 	@Test
@@ -169,19 +132,19 @@ public class GeneralDatabaseTest {
 		JSONParser parser = new JSONParser();
 		JSONObject json = (JSONObject) parser.parse(users.get("_NH7Cpq3qZkByP5xR4gXog").toString());
 		User u = new User(json);
-		assertTrue(users.get("_NH7Cpq3qZkByP5xR4gXog").equals(u));
+		assertTrue(users.get("_NH7Cpq3qZkByP5xR4gXog").similar(u));
 		
 		json = (JSONObject) parser.parse(reviews.get("0a-pCW4guXIlWNpVeBHChg").toString());
 		Review r = new Review (json);
-		assertTrue(reviews.get("0a-pCW4guXIlWNpVeBHChg").equals(r));
+		assertTrue(reviews.get("0a-pCW4guXIlWNpVeBHChg").similar(r));
 		
 		
 		json = (JSONObject) parser.parse(restaurants.get("gclB3ED6uk6viWlolSb_uA").toString());
 		Restaurant res = new Restaurant (json);
-		assertTrue(restaurants.get("gclB3ED6uk6viWlolSb_uA").equals(res));
+		assertTrue(restaurants.get("gclB3ED6uk6viWlolSb_uA").similar(res));
 
 	}
-	
+	/*
 	@Test
 	public void test7() throws ParseException, IOException {
 		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
@@ -219,7 +182,7 @@ public class GeneralDatabaseTest {
 		assertTrue(userInitialAverageRating < userAfterAverageRating);
 		
 	}
-	
+	*/
 	
 
 }

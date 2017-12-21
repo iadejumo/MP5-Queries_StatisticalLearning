@@ -34,4 +34,4 @@ name  : 'name' WS? LPAREN string RPAREN;
 rating  : 'rating' WS? INEQ WS? NUM; 
 price  : 'price' WS? INEQ WS? NUM; 
 
-string  : (WS? WORD WS?)+ (WS? SYMBOLS WS? WORD* WS? SYMBOLS* WS?)*;
+string  : ((WS? WORD WS?)+ (WS? SYMBOLS|LPAREN|RPAREN WS? WORD* WS? (SYMBOLS|LPAREN|RPAREN)* WS?)*)+;

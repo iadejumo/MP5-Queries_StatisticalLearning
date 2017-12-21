@@ -308,5 +308,20 @@ public class Restaurant {
 	public synchronized String toString() {
 		return jsonString;
 	}
+	
+	/**
+	 * checks the similarity of this Restaurant to other
+	 * 
+	 * @param other - Object to be compared to this in terms of equality
+	 * @return boolean - true if other and this are equal 
+	 */
+	public boolean similar(Object other) {
+		if (other instanceof Restaurant) {
+			Restaurant otherRes = (Restaurant) other;
+			return (this.business_id.equals(otherRes.business_id));
+		} else {
+			return false;
+		}
+	}
 
 }

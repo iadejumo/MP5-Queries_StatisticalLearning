@@ -186,4 +186,19 @@ public class Review {
 	public String toString() {
 		return jsonString;
 	}
+	
+	/**
+	 * checks the similarity of this Review to other
+	 * 
+	 * @param other - Object to be compared to this in terms of equality
+	 * @return boolean - true if other and this are equal 
+	 */
+	public boolean similar(Object other) {
+		if (other instanceof Review) {
+			Review otherRes = (Review) other;
+			return (this.review_id.equals(otherRes.review_id));
+		} else {
+			return false;
+		}
+	}
 }

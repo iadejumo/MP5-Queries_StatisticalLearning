@@ -232,4 +232,19 @@ public class User {
 	public synchronized String toString() {
 		return jsonString;
 	}
+	
+	/**
+	 * checks the similarity of this User to other
+	 * 
+	 * @param other - Object to be compared to this in terms of equality
+	 * @return boolean - true if other and this are equal 
+	 */
+	public boolean similar(Object other) {
+		if (other instanceof User) {
+			User otherRes = (User) other;
+			return (this.user_id.equals(otherRes.user_id));
+		} else {
+			return false;
+		}
+	}
 }

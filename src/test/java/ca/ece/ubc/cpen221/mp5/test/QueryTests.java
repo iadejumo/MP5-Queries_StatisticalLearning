@@ -52,7 +52,7 @@ public class QueryTests {
 		Set<String> matches = yelpDB.getMatches(query);
 		
 	}
-	/*
+	
 	@Test
 	public void test4() throws ParseException, IOException {
 		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
@@ -64,7 +64,7 @@ public class QueryTests {
 		assertEquals(8, matches.size());
 		
 	}
-	*/
+	
 	@Test
 	public void test5() throws ParseException, IOException {
 		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
@@ -116,7 +116,7 @@ public class QueryTests {
 		assertEquals(3, matches.size());	
 	}
 	
-	/*
+	
 	@Test 
 	public void test9() throws ParseException, IOException {
 		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
@@ -145,7 +145,7 @@ public class QueryTests {
 		int check = 0;
 		for (Restaurant rE: matchesExpected) {
 			for (Restaurant rG: matchesGenerated) {
-				if( rE.equals(rG)) {
+				if( rE.similar(rG)) {
 					check++;
 				}
 			}
@@ -153,7 +153,7 @@ public class QueryTests {
 		
 		assertEquals(3, check);
 	}
-	*/
+	
 	
 	@Test (expected = Exception.class)
 	public void test11() throws ParseException, IOException {
@@ -263,6 +263,28 @@ public class QueryTests {
 		Set<String> matches = yelpDB.getMatches(query);
 		
 		assertEquals(7, matches.size());	
+	}
+	
+	@Test
+	public void test21() throws ParseException, IOException {
+		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
+		
+		String query = "rating < 3";
+		
+		Set<String> matches = yelpDB.getMatches(query);
+		
+		assertEquals(15, matches.size());	
+	}
+	
+	@Test
+	public void test22() throws ParseException, IOException {
+		YelpDB yelpDB = new YelpDB(restaurantFile, reviewFile, userFile);
+		
+		String query = "price < 3";
+		
+		Set<String> matches = yelpDB.getMatches(query);
+		
+		assertEquals(115, matches.size());	
 	}
 
 	
