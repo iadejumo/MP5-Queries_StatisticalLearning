@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.ToDoubleBiFunction;
 import java.util.stream.Collectors;
 
@@ -71,7 +72,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 	private Map<String, Set<String>> userToReview;
 	private Map<String, Set<String>> restaurantToReview;
 	private Map<String, Set<String>> userToRestaurant;
-	
+
 	/**
 	 * Initializes and constructs the database. And establishes the relationships
 	 * between entries in the database
@@ -280,17 +281,17 @@ public class YelpDB implements MP5Db<Restaurant> {
 	 * @return the set of objects that matches the query
 	 */
 	@Override
-	public synchronized Set getMatches(String queryString){
+	public synchronized Set getMatches(String queryString) {
 		return parseInput(queryString);
 	}
 
-	private Set<String> parseInput(String input){
+	private Set<String> parseInput(String input) {
 		CharStream stream = new ANTLRInputStream(input);
 
 		QueryGrammarLexer lexer = new QueryGrammarLexer(stream);
 		lexer.removeErrorListeners();
 		lexer.addErrorListener(ThrowingErrorListener.INSTANCE);
-		
+
 		TokenStream tokens = new CommonTokenStream(lexer);
 
 		QueryGrammarParser parser = new QueryGrammarParser(tokens);
@@ -302,27 +303,27 @@ public class YelpDB implements MP5Db<Restaurant> {
 		System.err.println(tree.toStringTree(parser));
 
 		ParseTreeWalker walker = new ParseTreeWalker();
-		
+
 		QueryGrammarListener listener = new ExpressionEvalution(this);
-		
+
 		walker.walk(listener, tree);
-		
+
 		List<String> matches = ((ExpressionEvalution) listener).returnResults();
-		
+
 		if (matches.size() == 0) {
 			throw new NoMatchesException();
 		}
-		
+
 		System.out.println(((ExpressionEvalution) listener).returnResults().size());
-		
+
 		return mapBusinessToJSONString(matches);
 	}
-	
-	private Set<String> mapBusinessToJSONString (List<String> businessIDMatches){
-		
-		Set<String> setOfMatches = businessIDMatches.stream()
-		.map(x -> restaurants.get(x).toString()).collect(Collectors.toSet());
-		
+
+	private Set<String> mapBusinessToJSONString(List<String> businessIDMatches) {
+
+		Set<String> setOfMatches = businessIDMatches.stream().map(x -> restaurants.get(x).toString())
+				.collect(Collectors.toSet());
+
 		return setOfMatches;
 	}
 
@@ -514,10 +515,10 @@ public class YelpDB implements MP5Db<Restaurant> {
 	 * 
 	 * @param user
 	 *            represents a user_id in the database
-	 * @return a function that predicts the user's ratings for objects (of type
-	 *         T) in the database of type MP5Db<T>. The function that is
-	 *         returned takes two arguments: one is the database and other other
-	 *         is a String that represents the id of an object of type T.
+	 * @return a function that predicts the user's ratings for objects (of type T)
+	 *         in the database of type MP5Db<T>. The function that is returned takes
+	 *         two arguments: one is the database and other other is a String that
+	 *         represents the id of an object of type T.
 	 */
 	@Override
 	public synchronized ToDoubleBiFunction<MP5Db<Restaurant>, String> getPredictorFunction(String user) {
@@ -618,8 +619,8 @@ public class YelpDB implements MP5Db<Restaurant> {
 	 *         If price.size() < 2 then it throw an IllegalArgumentException because
 	 *         the data points are too few.
 	 */
-	private synchronized ToDoubleBiFunction<MP5Db<Restaurant>, String> generatePredictor(List<Long> xList, List<Long> yList,
-			double meanX, double meanY) {
+	private synchronized ToDoubleBiFunction<MP5Db<Restaurant>, String> generatePredictor(List<Long> xList,
+			List<Long> yList, double meanX, double meanY) {
 		int numReviews = xList.size();
 
 		if (numReviews <= 1) {
@@ -642,7 +643,7 @@ public class YelpDB implements MP5Db<Restaurant> {
 
 		double b = sxy / sxx;
 		double a = meanY - b * meanX;
-		double r_squared = Math.pow(sxy, 2) / (sxx * syy); //kept here because asked for in README
+		double r_squared = Math.pow(sxy, 2) / (sxx * syy); // kept here because asked for in README
 
 		ToDoubleBiFunction<MP5Db<Restaurant>, String> predictor = new ToDoubleBiFunctionModified(a, b);
 
@@ -659,93 +660,139 @@ public class YelpDB implements MP5Db<Restaurant> {
 	 *            represents a user_id in the database
 	 * @param newRating
 	 *            the new rating being submitted 1 <= newRating <= 5
-	 * @throws ParseException 
-	 * 				should never happen unless something goes very wrong...
+	 * @throws ParseException
+	 *             should never happen unless something goes very wrong...
 	 */
 	// This is supposed to be a private method that would be called by the addReview
 	// method, however, because for testing purposes, and since addReviews would not
 	// be completed in time for the first deadline it was changed to public.
-	private synchronized void updateRatingsAndRatingsCount(String business_id, String user_id, long newRating) throws ParseException {
+	private synchronized void updateRatingsAndRatingsCount(String business_id, String user_id, long newRating)
+			throws ParseException {
 		restaurants.get(business_id).updateRating(newRating);
-		users.get(user_id).updateRating(newRating);	
-	} //must be done to ensure no bad interleavings!
+		users.get(user_id).updateRating(newRating);
+	} // must be done to ensure no bad interleavings!
 
 	/**
-	 * Cluster objects into k clusters using k-means clustering
+	 * Adds a new Restaurant to this database
 	 * 
-	 * @param k
-	 *            number of clusters to create (0 < k <= (number of objects)/3 (weakened specs) )
-	 * @return a String, in JSON format, that represents the clusters
+	 * @param restaurantJsonString
+	 *            String in JSON format that contains the necessary fields for a new
+	 *            Restaurant (open, longitude, neighborhoods, name, categories,
+	 *            state, city, full_address, schools, latitude, price) with correct
+	 *            value types based on the current Restaurant format
+	 * @return a String, in JSON format, that represents the newly added Restaurant
+	 * @modifies this, adds the new Restaurant to the database
+	 * @throws InvalidRestaurantStringException
+	 *             if restaurantJsonString is not in the correct format
 	 */
 	public synchronized String addRestaurant(String restaurantJsonString) throws InvalidRestaurantStringException {
 		try {
 			JSONObject jObj = createJsonObj(restaurantJsonString);
-			if (!checkIfRestaurantJson(jObj)) 
+			if (!checkIfRestaurantJson(jObj))
 				throw new Exception();
-			
+
 			Restaurant r = new Restaurant(jObj);
 			restaurants.put(r.getBusiness_id(), r);
 			restaurantToReview.put(r.getBusiness_id(), new HashSet<String>());
-			System.out.println("New Restaurant: "+r.toString());
+			System.out.println("New Restaurant: " + r.toString());
 			return r.toString();
 		} catch (Exception e) {
 			throw new InvalidRestaurantStringException();
 		}
-		
+
 	}
-	
-	public synchronized String addReview(String reviewJsonString) throws InvalidReviewStringException, NoSuchUserException, NoSuchRestaurantException {
+
+	/**
+	 * Adds a new Review to this database
+	 * 
+	 * @param reviewJsonString
+	 *            String in JSON format that contains the necessary fields for a new
+	 *            Review (business_id, votes, text, stars, user_id, date) with
+	 *            correct value types based on the current Review format
+	 * 
+	 *            MUST have business_id of Restaurant already in database
+	 * 
+	 *            MUST have user_id of User already in database
+	 * 
+	 * @return a String, in JSON format, that represents the newly added Review
+	 * @modifies this, adds the new Review to the database
+	 * @throws InvalidReviewStringException
+	 *             if reviewJsonString is not in the correct format
+	 * @throws NoSuchRestaurantException
+	 *             If the reviewJsonString's business_id is not the id of a
+	 *             Restaurant already in the database
+	 * @throws NoSuchUserException
+	 *             If the reviewJsonString's user_id is not the id of a User already
+	 *             in the database
+	 */
+	public synchronized String addReview(String reviewJsonString)
+			throws InvalidReviewStringException, NoSuchUserException, NoSuchRestaurantException {
 		try {
+			System.out.println("Starting addReview");
 			JSONObject jObj = createJsonObj(reviewJsonString);
-			if (!checkIfReviewJson(jObj)) 
+			System.out.println("jObj created");
+			if (!checkIfReviewJson(jObj))
 				throw new IOException();
-			
+			System.out.println("checkIfReview successful");
 			Review r = new Review(jObj);
 			if (!users.containsKey(r.getUser_id()))
 				throw new NoSuchUserException();
+			System.out.println("correct UserID");
 			if (!restaurants.containsKey(r.getBusiness_id()))
 				throw new NoSuchRestaurantException();
+			System.out.println("correct BusinessID");
+			
 			reviews.put(r.toString(), r);
 			userToReview.get(r.getUser_id()).add(r.getReview_id());
 			userToRestaurant.get(r.getUser_id()).add(r.getBusiness_id());
 			restaurantToReview.get(r.getBusiness_id()).add(r.getReview_id());
-			updateRatingsAndRatingsCount(r.getBusiness_id(),r.getUser_id(),r.getStars());
+			updateRatingsAndRatingsCount(r.getBusiness_id(), r.getUser_id(), r.getStars());
 			System.out.println("New Review: " + r.toString());
 			return r.toString();
 		} catch (ParseException e) {
-			throw new InvalidReviewStringException(); //note may need to check that the updateRatings function is not causing this exception to be thrown
+			throw new InvalidReviewStringException(); // note may need to check that the updateRatings function is not
+														// causing this exception to be thrown
 		} catch (IOException e) {
-			throw new InvalidReviewStringException(); //note may need to check that the updateRatings function is not causing this exception to be thrown
-		}catch (NoSuchUserException nsue) {
+			throw new InvalidReviewStringException(); // note may need to check that the updateRatings function is not
+														// causing this exception to be thrown
+		} catch (NoSuchUserException nsue) {
 			throw new NoSuchUserException();
 		} catch (NoSuchRestaurantException nsre) {
 			throw new NoSuchRestaurantException();
 		}
-		
+
 	}
-	
+
 	private static final String userFile = "data/users.json";
 	private static final String restaurantFile = "data/restaurants.json";
 	private static final String reviewFile = "data/reviews.json";
-	
-	public static void main(String[] args) throws ParseException, IOException, InvalidReviewStringException, NoSuchUserException, NoSuchRestaurantException {
+
+	public static void main(String[] args) throws ParseException, IOException, InvalidReviewStringException,
+			NoSuchUserException, NoSuchRestaurantException {
 		YelpDB y = new YelpDB(restaurantFile, reviewFile, userFile);
+		
+		for (String s: y.getRestaurants().keySet())
+			System.out.println(y.getRestaurants().get(s).toString());
 		System.out.println(y.addReview("{\"name\": Tyler L.\"}"));
 	}
+
 	/**
-	 * Creates/ initializes a new user and adds them to the database
+	 * Adds a new User to this database
 	 * 
-	 * @param name
-	 *            name of the new user/member is not null
-	 * @return Json string representation of the new user's profile in the database
-	 * @throws InvalidUserStringException 
+	 * @param userJsonString
+	 *            String in JSON format that contains the necessary fields for a new
+	 *            User (Key: "name" -> Value: String)
+	 * @return a String, in JSON format, that represents the newly added User
+	 * @modifies this, adds the new User to the database
+	 * @throws InvalidUserStringException
+	 *             if userJsonString is not in the correct format
 	 */
 	public synchronized String addUser(String userJsonString) throws InvalidUserStringException {
 		try {
 			JSONObject jObj = createJsonObj(userJsonString);
-			if (!checkIfUserJson(jObj)) 
+			if (!checkIfUserJson(jObj))
 				throw new Exception();
-			
+
 			String name = ((String) jObj.get("name"));
 			User u = new User(name);
 			users.put(u.getUser_id(), u);
@@ -757,29 +804,87 @@ public class YelpDB implements MP5Db<Restaurant> {
 			throw new InvalidUserStringException();
 		}
 	}
+
+	private synchronized void updateReviewJson(JSONObject jObj) {
+		jObj.put("type", "review");
+		jObj.put("review_id", generateID(jObj));
+	}
+
+	private synchronized void updateRestaurantJson(JSONObject jObj) {
+		jObj.put("review_count", 0.0);
+		jObj.put("stars", 0.0);
+		jObj.put("type", "restaurant");
+		String bus_id = generateID(jObj);
+		jObj.put("business_id", bus_id);
+		jObj.put("url", generateRestaurantURL(bus_id));
+		jObj.put("photo_url", generateRestaurantURL(bus_id)+"/photo");
+	}
+
+	// creates random id for new review/restaurant
+	private synchronized String generateID(JSONObject jObj) {
+		String uniqueID = UUID.randomUUID().toString();
+		uniqueID += jObj.hashCode();
+		return uniqueID;
+	}
+
+	// creates the url for new user
+	private String generateRestaurantURL(String business_id) {
+		String defaultURL = "http://www.yelp.com/business_details?businessid=";
+		return defaultURL + business_id;
+	}
 	
+
+	// checks if jObj has the correct keys and value types for Review
 	private boolean checkIfReviewJson(JSONObject jObj) {
-		if (jObj.get("business_id") == null || jObj.get("votes") == null || jObj.get("text") == null || jObj.get("stars") == null || jObj.get("user_id") == null || jObj.get("date") == null )
+		if (jObj.get("business_id") == null || jObj.get("votes") == null || jObj.get("text") == null
+				|| jObj.get("stars") == null || jObj.get("user_id") == null || jObj.get("date") == null)
 			return false;
-		return true;	
+		System.out.println("No nulls");
+		System.out.println(jObj.keySet());
+		System.out.println(jObj.values());
+		if (jObj.get("business_id") instanceof String)
+			System.out.println(jObj.get("business_id"));
+		if (jObj.get("stars") instanceof Long)
+			System.out.println(jObj.get("stars"));
+		if (!(jObj.get("business_id") instanceof String) 
+				|| !(jObj.get("text") instanceof String) || !(jObj.get("stars") instanceof Long)
+				|| !(jObj.get("user_id") instanceof String) || !(jObj.get("date") instanceof String))
+			return false;
+		System.out.println("All correct types");
+		return true;
 	}
-	
+
+	// checks if jObj has the correct keys and value types for Restaurant
 	private boolean checkIfRestaurantJson(JSONObject jObj) {
-		if (jObj.get("open") == null || jObj.get("url") == null || jObj.get("longitude") == null || jObj.get("neighborhoods") == null || jObj.get("name") == null || jObj.get("categories") == null || jObj.get("state") == null|| jObj.get("city") == null || jObj.get("full_address") == null || jObj.get("photo_url") == null || jObj.get("schools") == null || jObj.get("latitude") == null || jObj.get("price") == null)
+		if (jObj.get("open") == null || jObj.get("url") == null || jObj.get("longitude") == null
+				|| jObj.get("neighborhoods") == null || jObj.get("name") == null || jObj.get("categories") == null
+				|| jObj.get("state") == null || jObj.get("city") == null || jObj.get("full_address") == null
+				|| jObj.get("schools") == null || jObj.get("latitude") == null || jObj.get("price") == null)
 			return false;
-		return true;	
-	}
-	private boolean checkIfUserJson(JSONObject jObj) {
-		if (jObj.get("name") == null)
+		if (!(jObj.get("open") instanceof Boolean) || !(jObj.get("longitude") instanceof Double)
+				|| !(jObj.get("neighborhoods") instanceof List) || !(jObj.get("name") instanceof String)
+				|| !(jObj.get("categories") instanceof List) || !(jObj.get("state") instanceof String)
+				|| !(jObj.get("city") instanceof String) || !(jObj.get("full_address") instanceof String)
+				|| !(jObj.get("schools") instanceof List) || !(jObj.get("latitude") instanceof Double)
+				|| !(jObj.get("price") instanceof Long))
 			return false;
 		return true;
 	}
+
+	// checks if jObj has the correct keys and value types for User
+	private boolean checkIfUserJson(JSONObject jObj) {
+		if (jObj.get("name") == null)
+			return false;
+		if (!(jObj.get("name") instanceof String))
+			return false;
+		return true;
+	}
+
 	private synchronized JSONObject createJsonObj(String jsonString) throws ParseException {
 		JSONParser parser = new JSONParser();
 		Object obj;
 		obj = parser.parse(jsonString);
-		return (JSONObject)obj;
+		return (JSONObject) obj;
 	}
-	
-	
+
 }
